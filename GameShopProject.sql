@@ -1,0 +1,29 @@
+CREATE DATABASE GameShop; 
+CREATE TABLE Roles (
+r_id INT PRIMARY KEY AUTO_INCREMENT,
+r_name VARCHAR (50)
+);
+
+CREATE TABLE Suppliers(
+s_id INT PRIMARY KEY AUTO_INCREMENT,
+s_name VARCHAR (50)
+);
+
+CREATE TABLE Clients (
+c_id INT PRIMARY KEY AUTO_INCREMENT,
+c_name VARCHAR (25),
+c_LastName VARCHAR(25),
+c_email VARCHAR (100),
+
+CREATE TABLE Tickets;
+
+
+CREATE TABLE Category_game;
+
+
+CREATE TABLE Stock;
+CREATE TABLE Employees;
+CREATE TABLE Branches;
+CREATE TABLE Departments;
+CREATE TABLE Products;
+CREATE TABLE Audit_Log;
