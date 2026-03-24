@@ -1561,7 +1561,7 @@ SELECT e.e_name, e.e_lastName, r.r_name, b.b_name FROM Employees e
 
 
 -- VIEWS 
--- 1. Total de compras por cliente
+-- Total de compras por cliente
 CREATE VIEW SalesxClient AS
 	SELECT CONCAT(c.c_name,' ', c.c_lastName) AS Cliente, 
 		COUNT(t.t_id) AS TotalSales FROM Clients c
@@ -1571,7 +1571,7 @@ CREATE VIEW SalesxClient AS
 
 SELECT * FROM SalesxClient;
 
--- 2. Total de Ventas por Sucursal 
+-- Total de Ventas por Sucursal 
 CREATE VIEW SalesxBranch AS
 	SELECT b.b_name, COUNT(t.t_id) AS BranchSales FROM Branches b
     JOIN Tickets t ON b.b_id = t.b_id
@@ -1579,4 +1579,359 @@ CREATE VIEW SalesxBranch AS
     
 SELECT * FROM SalesxBranch;
     
-    
+-- Views 23/03/2026
+-- 1. Catálogo Completo
+CREATE OR REPLACE VIEW Catalogo_Completo AS
+SELECT
+	p.p_id AS ID,
+    p.p_name AS Producto,
+    c.cat_name AS Categoria,
+    s.s_name AS Proveedor,
+    con.con_name AS Consola,
+    p.p_price AS Precio
+FROM Products p
+JOIN Category_game c ON p.cat_id = c.cat_id
+JOIN Suppliers s ON p.s_id = s.s_id
+JOIN Consoles con ON p.con_id = con.con_id;
+
+-- 2. Inventarios en estados criticos
+CREATE OR REPLACE VIEW Inventario_Critico AS
+SELECT
+	b.b_name AS Sucursal,
+    p.p_name AS Producto,
+    st.st_quantity AS Cantidad
+FROM Stock st
+JOIN Products p ON st.p_id = p.p_id
+JOIN Branches b ON st.b_id = b.b_id
+WHERE st.st_quantity < 10
+ORDER BY st.st_quantity ASC;
+
+-- 3. Top 5 clientes VIP
+CREATE VIEW Top_Clientes AS
+SELECT 
+    c.c_name AS Nombre, 
+    c.c_lastName AS Apellido, 
+    COUNT(t.t_id) AS Total_Compras, 
+    SUM(t.t_SalePrice) AS Dinero_Gastado
+FROM Clients c
+JOIN Tickets t ON c.c_id = t.c_id
+GROUP BY c.c_id
+ORDER BY Dinero_Gastado DESC
+LIMIT 5;
+
+-- 4. Rendimiento por empleado
+CREATE VIEW Rendimiento_Empleados AS
+SELECT 
+    e.e_name AS Empleado,
+    b.b_name AS Sucursal,
+    COUNT(t.t_id) AS Ventas_Realizadas,
+    SUM(t.t_SalePrice) AS Ingresos_Generados
+FROM Tickets t
+JOIN Employees e ON t.e_id = e.e_id
+JOIN Branches b ON t.b_id = b.b_id
+GROUP BY e.e_id, b.b_name
+ORDER BY Ingresos_Generados DESC;
+
+-- 5. Demografía de clientes
+CREATE VIEW Demografia_Ubicacion AS
+SELECT 
+    c_location AS Ubicacion, 
+    COUNT(c_id) AS Total_Clientes
+FROM Clients
+GROUP BY c_location
+ORDER BY Total_Clientes DESC;
+
+-- 6. Ingresos Totales por sucursal
+CREATE VIEW Ingresos_Sucursal AS
+SELECT 
+    b.b_name AS Sucursal, 
+    COUNT(t.t_id) AS Total_Tickets, 
+    SUM(t.t_SalePrice) AS Ingresos_Totales
+FROM Tickets t
+JOIN Branches b ON t.b_id = b.b_id
+GROUP BY b.b_name
+ORDER BY Ingresos_Totales DESC;
+
+-- 7. Valor del inventario por consolas
+CREATE VIEW Valor_Stock_Consola AS
+SELECT 
+    con.con_name AS Consola, 
+    SUM(st.st_quantity) AS Total_Copias,
+    SUM(st.st_quantity * p.p_price) AS Valor_Monetario_Total
+FROM Stock st
+JOIN Products p ON st.p_id = p.p_id
+JOIN Consoles con ON p.con_id = con.con_id
+GROUP BY con.con_name
+ORDER BY Valor_Monetario_Total DESC;
+
+-- 8. Cantidad de juegos por categoria
+CREATE VIEW Juegos_Por_Categoria AS
+SELECT 
+    c.cat_name AS Categoria, 
+    COUNT(p.p_id) AS Titulos_Diferentes
+FROM Products p
+JOIN Category_game c ON p.cat_id = c.cat_id
+GROUP BY c.cat_name
+ORDER BY Titulos_Diferentes DESC;
+
+-- 9. Vista general de empleados
+CREATE VIEW Directorio_Empleados AS
+SELECT 
+    CONCAT(e.e_name, ' ', e.e_lastName) AS Nombre_Completo,
+    e.e_phone AS Telefono,
+    e.e_email AS Correo,
+    r.r_name AS Puesto,
+    b.b_name AS Sucursal
+FROM Employees e
+JOIN Roles r ON e.r_id = r.r_id
+JOIN Branches b ON e.b_id = b.b_id;
+
+-- 10. Ultimas acciones de auditoria
+CREATE VIEW Auditoria_Reciente AS
+SELECT 
+    l_date AS Fecha_Hora, 
+    l_user AS Usuario, 
+    l_table AS Tabla_Afectada, 
+    l_action AS Accion_Realizada
+FROM Audit_Log
+ORDER BY l_date DESC
+LIMIT 50;
+
+-- Triggers para validaciones de nuestras entidades
+DELIMITER //
+
+-- 1. Evitar precio ngativo en un producto
+CREATE TRIGGER Val_PrecioProd
+BEFORE INSERT ON Products
+FOR EACH ROW
+BEGIN
+    IF NEW.p_price <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: El precio no puede ser 0 o negativo.';
+    END IF;
+END //
+
+-- 2. Evitar total negativo en ventas
+CREATE TRIGGER Val_TicketTotal
+BEFORE INSERT ON Tickets
+FOR EACH ROW
+BEGIN
+    IF NEW.t_SalePrice < 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: El ticket no puede ser negativo.';
+    END IF;
+END //
+
+-- 3. Evitar stock negativo
+CREATE TRIGGER Val_Stock
+BEFORE UPDATE ON Stock
+FOR EACH ROW
+BEGIN
+    IF NEW.st_quantity < 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: El stock no puede ser menor a 0.';
+    END IF;
+END //
+
+-- 4. Validar formato de correo en clientes
+CREATE TRIGGER Val_EmailClient
+BEFORE INSERT ON Clients
+FOR EACH ROW
+BEGIN
+    IF NEW.c_email NOT LIKE '%@%' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Correo de cliente inválido.';
+    END IF;
+END //
+
+-- 5. Validar formato de correo en Empleados
+CREATE TRIGGER Val_EmailEmp
+BEFORE INSERT ON Employees
+FOR EACH ROW
+BEGIN
+    IF NEW.e_email NOT LIKE '%@%' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Correo de empleado inválido.';
+    END IF;
+END //
+
+-- 6. Auditoria nuevo producto
+CREATE TRIGGER Aud_Prod
+AFTER INSERT ON Products
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (CURRENT_USER(), 'Products', CONCAT('Nuevo producto: ', NEW.p_name));
+END //
+
+-- 7. Auditoria nueva venta
+CREATE TRIGGER Aud_Ticket
+AFTER INSERT ON Tickets
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (CURRENT_USER(), 'Tickets', CONCAT('Venta registrada. Total: $', NEW.t_SalePrice));
+END //
+
+-- 8. Auditoria actualización del stock
+CREATE TRIGGER Aud_Stock
+AFTER UPDATE ON Stock
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (CURRENT_USER(), 'Stock', CONCAT('Stock modificado. Prod ID: ', NEW.p_id, ' | Nueva cant: ', NEW.st_quantity));
+END //
+
+-- 9. Auditoria nuevo cliente
+CREATE TRIGGER Aud_Client
+AFTER INSERT ON Clients
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (CURRENT_USER(), 'Clients', CONCAT('Alta cliente: ', NEW.c_name, ' ', NEW.c_lastName));
+END //
+
+-- 10. Auditoria neuvo empleado
+CREATE TRIGGER Aud_Emp
+AFTER INSERT ON Employees
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (CURRENT_USER(), 'Employees', CONCAT('Alta empleado: ', NEW.e_name, ' ', NEW.e_lastName));
+END //
+
+DELIMITER ;
+
+-- 1. CRUD en Products
+DELIMITER // 
+-- Create para insertar
+CREATE PROCEDURE CrearProducto(
+    IN p_nombre VARCHAR(50), 
+    IN p_precio DECIMAL(10,2), 
+    IN p_cat INT, 
+    IN p_prov INT, 
+    IN p_consola INT
+)
+BEGIN
+    INSERT INTO Products (p_name, p_price, cat_id, s_id, con_id) 
+    VALUES (p_nombre, p_precio, p_cat, p_prov, p_consola);
+END //
+
+-- READ con joins
+CREATE PROCEDURE LeerProductos()
+BEGIN
+    SELECT p.p_id, p.p_name, p.p_price, c.cat_name, s.s_name, con.con_name 
+    FROM Products p
+    JOIN Category_game c ON p.cat_id = c.cat_id
+    JOIN Suppliers s ON p.s_id = s.s_id
+    JOIN Consoles con ON p.con_id = con.con_id;
+END //
+
+-- UPDATE en precios
+CREATE PROCEDURE ActualizarPrecioProducto(IN p_id INT, IN p_nuevo_precio DECIMAL(10,2))
+BEGIN
+    UPDATE Products SET p_price = p_nuevo_precio WHERE p_id = p_id;
+END //
+
+-- DELETE 
+CREATE PROCEDURE EliminarProducto(IN p_id INT)
+BEGIN
+    DELETE FROM Products WHERE p_id = p_id;
+END //
+
+-- 2. CRUD en Clients
+-- CREATE para nuevo cliente
+CREATE PROCEDURE CrearCliente(
+    IN p_nombre VARCHAR(25), 
+    IN p_apellido VARCHAR(25), 
+    IN p_email VARCHAR(100), 
+    IN p_nacimiento DATE, 
+    IN p_ubicacion VARCHAR(100)
+)
+BEGIN
+    INSERT INTO Clients (c_name, c_lastName, c_email, c_BirthDate, c_location) 
+    VALUES (p_nombre, p_apellido, p_email, p_nacimiento, p_ubicacion);
+END //
+
+-- READ info de cliente
+CREATE PROCEDURE LeerClientes()
+BEGIN
+    SELECT * FROM Clients ORDER BY c_name ASC;
+END //
+
+-- UPDATE enfocado en la ubicacion y su email
+CREATE PROCEDURE ActualizarDatosCliente(IN p_id INT, IN p_email VARCHAR(100), IN p_ubicacion VARCHAR(100))
+BEGIN
+    UPDATE Clients SET c_email = p_email, c_location = p_ubicacion WHERE c_id = p_id;
+END //
+
+-- DELETE un cliente
+CREATE PROCEDURE EliminarCliente(IN p_id INT)
+BEGIN
+    DELETE FROM Clients WHERE c_id = p_id;
+END //
+
+-- 3. CRUD para Employees
+-- CREATE nuevo empleado
+
+CREATE PROCEDURE CrearEmpleado(
+    IN p_nombre VARCHAR(50), IN p_apellido VARCHAR(50), 
+    IN p_tel VARCHAR(20), IN p_email VARCHAR(50), 
+    IN p_nac DATE, IN p_rol INT, IN p_sucursal INT
+)
+BEGIN
+    INSERT INTO Employees (e_name, e_lastName, e_phone, e_email, e_BirthDate, r_id, b_id) 
+    VALUES (p_nombre, p_apellido, p_tel, p_email, p_nac, p_rol, p_sucursal);
+END //
+
+-- READ para info de empleado
+CREATE PROCEDURE LeerEmpleados()
+BEGIN
+    SELECT e.e_id, CONCAT(e.e_name, ' ', e.e_lastName) AS Nombre, r.r_name AS Puesto, b.b_name AS Sucursal
+    FROM Employees e
+    JOIN Roles r ON e.r_id = r.r_id
+    JOIN Branches b ON e.b_id = b.b_id;
+END //
+
+-- UPDATE mover de sucursal
+CREATE PROCEDURE TrasladarEmpleado(IN p_id INT, IN p_nueva_sucursal INT)
+BEGIN
+    UPDATE Employees SET b_id = p_nueva_sucursal WHERE e_id = p_id;
+END //
+
+-- DELETE (ni que hubiera pierde aqui)
+CREATE PROCEDURE EliminarEmpleado(IN p_id INT)
+BEGIN
+    DELETE FROM Employees WHERE e_id = p_id;
+END //
+
+-- 4. CRUD para Tickets
+
+-- CREATE nuevo ticket
+CREATE PROCEDURE CrearTicket(
+    IN p_fecha DATETIME, IN p_total DECIMAL(10,2), 
+    IN p_cliente INT, IN p_empleado INT, IN p_sucursal INT
+)
+BEGIN
+    INSERT INTO Tickets (t_date, t_SalePrice, c_id, e_id, b_id) 
+    VALUES (p_fecha, p_total, p_cliente, p_empleado, p_sucursal);
+END //
+
+-- READ
+CREATE PROCEDURE LeerTickets()
+BEGIN
+    SELECT t.t_id, t.t_date, t.t_SalePrice, c.c_name AS Cliente, b.b_name AS Sucursal 
+    FROM Tickets t
+    JOIN Clients c ON t.c_id = c.c_id
+    JOIN Branches b ON t.b_id = b.b_id
+    ORDER BY t.t_date DESC;
+END //
+
+-- UPDATE para corregir el totalfinal del ticket
+CREATE PROCEDURE CorregirTotalTicket(IN p_id INT, IN p_nuevo_total DECIMAL(10,2))
+BEGIN
+    UPDATE Tickets SET t_SalePrice = p_nuevo_total WHERE t_id = p_id;
+END //
+
+-- DELETE por si cancelan venta
+CREATE PROCEDURE CancelarTicket(IN p_id INT)
+BEGIN
+    DELETE FROM Tickets WHERE t_id = p_id;
+END //
+
+DELIMITER ;
