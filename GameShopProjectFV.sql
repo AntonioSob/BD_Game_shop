@@ -1,0 +1,2088 @@
+DROP DATABASE IF EXISTS GameShop;
+CREATE DATABASE GameShop;
+USE GameShop;
+
+CREATE TABLE Roles (
+    r_id INT PRIMARY KEY AUTO_INCREMENT,
+    r_name VARCHAR(50)
+);
+
+CREATE TABLE Suppliers (
+    s_id INT PRIMARY KEY AUTO_INCREMENT,
+    s_name VARCHAR(50)
+);
+
+CREATE TABLE Clients (
+    c_id INT PRIMARY KEY AUTO_INCREMENT,
+    c_name VARCHAR(25),
+    c_lastName VARCHAR(25),
+    c_email VARCHAR(100),
+    c_BirthDate DATE,
+    c_location VARCHAR(100)
+);
+
+CREATE TABLE Category_game (
+    cat_id INT PRIMARY KEY AUTO_INCREMENT,
+    cat_name VARCHAR(50)
+);
+
+CREATE TABLE Consoles (
+    con_id INT PRIMARY KEY AUTO_INCREMENT,
+    con_name VARCHAR(25),
+    con_price DECIMAL(10,2)
+);
+
+CREATE TABLE Products (
+    p_id INT PRIMARY KEY AUTO_INCREMENT,
+    p_name VARCHAR(50),
+    p_price DECIMAL(10,2),
+    cat_id INT,
+    s_id INT,
+    con_id INT,
+    FOREIGN KEY (cat_id) REFERENCES Category_game(cat_id),
+    FOREIGN KEY (s_id) REFERENCES Suppliers(s_id),
+    FOREIGN KEY (con_id) REFERENCES Consoles(con_id)
+);
+
+CREATE TABLE Branches (
+    b_id INT PRIMARY KEY AUTO_INCREMENT,
+    b_name VARCHAR(50),
+    b_location VARCHAR(100)
+);
+
+CREATE TABLE Stock (
+    st_id INT PRIMARY KEY AUTO_INCREMENT,
+    p_id INT,
+    b_id INT,
+    st_quantity INT,
+    FOREIGN KEY (p_id) REFERENCES Products(p_id),
+    FOREIGN KEY (b_id) REFERENCES Branches(b_id)
+);
+
+CREATE TABLE Employees (
+    e_id INT PRIMARY KEY AUTO_INCREMENT,
+    e_name VARCHAR(50),
+    e_lastName VARCHAR(50),
+    e_phone VARCHAR(20),
+    e_email VARCHAR(50),
+    e_BirthDate DATE,
+    r_id INT,
+    b_id INT,
+    FOREIGN KEY (r_id) REFERENCES Roles(r_id),
+    FOREIGN KEY (b_id) REFERENCES Branches(b_id)
+);
+
+CREATE TABLE Departments (
+    d_id INT PRIMARY KEY AUTO_INCREMENT,
+    d_name VARCHAR(50),
+    e_id INT,
+    FOREIGN KEY (e_id) REFERENCES Employees(e_id)
+);
+
+CREATE TABLE Tickets (
+    t_id INT PRIMARY KEY AUTO_INCREMENT,
+    t_date DATETIME,
+    c_id INT,
+    e_id INT,
+    b_id INT,
+    t_SalePrice DECIMAL (10,2),
+    FOREIGN KEY (c_id) REFERENCES Clients(c_id),
+    FOREIGN KEY (e_id) REFERENCES Employees(e_id),
+    FOREIGN KEY (b_id) REFERENCES Branches(b_id)
+);
+
+CREATE TABLE Audit_Log (
+    l_id INT PRIMARY KEY AUTO_INCREMENT,
+    l_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    l_user VARCHAR(100),
+    l_table VARCHAR(50),
+    l_action VARCHAR(200)
+);
+
+
+-- INSERTS
+-- Roles
+INSERT INTO Roles (r_name) VALUES
+('Manager'),
+('Cashier'),
+('Warehouse');
+
+-- Sucursales
+INSERT INTO Branches (b_name, b_location) VALUES
+('Sucursal Río', 'Plaza Río'),
+('Sucursal Chapultepec', 'Plaza Chapultepec'),
+('Sucursal Pacífico', 'Parque Industrial Pacífico');
+
+
+-- Categorias
+INSERT INTO Category_game (cat_name) VALUES
+('Sports'),
+('Survival Horror'),
+('Adventure'),
+('RPG'),
+('Terror'),
+('Arcade'),
+('Shooter');
+
+-- Proveedores
+INSERT INTO Suppliers (s_name) VALUES
+('Riot Games'),
+('FromSoftware'),
+('Team Cherry'),
+('Nintendo'),
+('Sony'),
+('Microsoft');
+
+-- Consolas
+INSERT INTO Consoles (con_name, con_price) VALUES
+('PlayStation 5', 10500.00),
+('PlayStation 5 Digital', 8500.00),
+('Xbox Series X', 10500.00),
+('Xbox Series S', 6500.00),
+('Nintendo Switch OLED', 7000.00),
+('Nintendo Switch', 5500.00),
+('Nintendo Switch Lite', 4000.00),
+('PlayStation 4 Slim', 5000.00),
+('Xbox One S', 4500.00),
+('Steam Deck', 12000.00),
+('Nintendo Switch 2', 9000.00),
+('PlayStation 5 Pro', 13000.00);
+
+-- Empleados
+INSERT INTO Employees (e_name, e_lastName, e_phone, e_email, e_BirthDate, r_id, b_id) VALUES
+('Fernando', 'Ruiz', '6641112233', 'fer@gameshop.com', '1990-10-10', 1, 1),
+('Gabriela', 'Sánchez', '6614445566', 'gaby@gameshop.com', '1995-02-25', 1, 1),
+('Héctor', 'Jiménez', '6647778899', 'hector@gameshop.com', '1998-05-14', 1, 2),
+('Isabel', 'Luna', '6612223344', 'isa@gameshop.com', '2001-08-30', 1, 2),
+('Miguel', 'Castro', '6645556677', 'miguel@gameshop.com', '1985-11-20', 1, 3),
+('Daniela', 'Vargas', '6618889900', 'dani@gameshop.com', '1992-03-15', 1, 3 ),
+('Alejandro', 'Méndez', '6643334455', 'alex@gameshop.com', '1996-07-07', 3, 1),
+('Valeria', 'Ríos', '6616667788', 'vale@gameshop.com', '1999-09-09', 3, 1),
+('Carlos', 'Mendez', '6641223344', 'carlos.m@gameshop.com', '1992-04-15', 3, 2),
+('Sofia', 'Ramirez', '6641334455', 'sofia.r@gameshop.com', '1996-08-22', 2, 1),
+('Luis', 'Garcia', '6641445566', 'luis.g@gameshop.com', '1989-12-10', 3, 1),
+('Maria', 'Lopez', '6641556677', 'maria.l@gameshop.com', '1994-03-28', 2, 1),
+('Jorge', 'Torres', '6641667788', 'jorge.t@gameshop.com', '1991-07-14', 2, 2),
+('Ana', 'Flores', '6641778899', 'ana.f@gameshop.com', '1997-11-01', 3, 2),
+('Pedro', 'Morales', '6641889900', 'pedro.m@gameshop.com', '1988-05-19', 3, 2 ),
+('Laura', 'Reyes', '6641990011', 'laura.r@gameshop.com', '1995-09-06', 3, 3),
+('Diego', 'Cruz', '6642001122', 'diego.c@gameshop.com', '1990-01-23', 3, 3),
+('Elena', 'Vazquez', '6642112233', 'elena.v@gameshop.com', '1993-06-11', 3, 3),
+('Raul', 'Hernandez', '6642223344', 'raul.h@gameshop.com', '1987-10-29', 3, 3),
+('Carmen', 'Jimenez', '6642334455', 'carmen.j@gameshop.com', '1998-02-16', 3, 2),
+('Roberto', 'Sanchez', '6642445566', 'roberto.s@gameshop.com', '1992-07-04', 3, 1),
+('Patricia', 'Gutierrez', '6642556677', 'patricia.g@gameshop.com', '1986-11-21', 3, 2),
+('Ricardo', 'Castillo', '6642667788', 'ricardo.c@gameshop.com', '1999-04-08', 3, 3),
+('Gabriela', 'Romero', '6642778899', 'gabriela.r@gameshop.com', '1991-08-26', 3, 1),
+('Fernando', 'Medina', '6642889900', 'fernando.me@gameshop.com', '1994-12-13', 3, 1),
+('Isabel', 'Chavez', '6642990011', 'isabel.c@gameshop.com', '1988-03-31', 2, 3),
+('Andres', 'Rojas', '6643001122', 'andres.r@gameshop.com', '1996-07-18', 2, 3),
+('Daniela', 'Ortiz', '6643112233', 'daniela.o@gameshop.com', '1990-11-05', 3, 3),
+('Miguel', 'Perez', '6643223344', 'miguel.p@gameshop.com', '1985-05-23', 3, 1),
+('Valeria', 'Aguilar', '6643334455', 'valeria.a@gameshop.com', '1997-09-10', 3, 2);
+
+
+-- Departamentos
+INSERT INTO Departments (d_name, e_id) VALUES
+('Ventas', 1),
+('Almacén General', 3),
+('Atención al Cliente', 2),
+('Gerencia', 5),
+('Soporte Técnico', 7);
+
+
+-- Clientes
+INSERT INTO Clients (c_name, c_lastName, c_email, c_BirthDate, c_location) VALUES
+('Ramses', 'Rafael', 'ramses.r@email.com', '1994-05-12', 'Otay'),
+('Antonio', 'Soberanis', 'antonio.s@email.com', '1990-08-25', 'Rosarito'),
+('Roberto', 'Gil', 'roberto.g@email.com', '1988-03-17', 'Centro'),
+('Ana', 'García', 'ana@email.com', '1998-08-20', 'Rosarito'),
+('Luis', 'Ramírez', 'luis.r@email.com', '2001-01-06', 'Playas de Tijuana'),
+('María', 'Gómez', 'maryg@email.com', '1990-11-12', 'Centro'),
+('Carlos', 'López', 'clopez@email.com', '1985-03-22', 'Macroplaza'),
+('Sofía', 'Martínez', 'sofi.m@email.com', '1999-07-30', 'Rosarito'),
+('Jorge', 'Hernández', 'jorgeh@email.com', '2003-09-14', 'Otay'),
+('Laura', 'Díaz', 'laurad@email.com', '1992-12-05', 'Santa Fe'),
+('Diego', 'Torres', 'diegot@email.com', '1988-04-18', 'Playas de Tijuana'),
+('Elena', 'Flores', 'elenaf@email.com', '1996-06-25', 'Zona Río'),
+('Raúl', 'Vázquez', 'raulv@email.com', '1991-02-10', 'Rosarito'),
+('Carmen', 'Morales', 'carmenm@email.com', '1989-08-08', 'Otay'),
+('Roberto', 'Ortiz', 'robertoo@email.com', '2000-10-31', 'Centro'),
+('Patricia', 'Cruz', 'patyc@email.com', '1994-01-19', 'Macroplaza'),
+('Ricardo', 'Reyes', 'ricardor@email.com', '1997-05-28', 'Playas de Tijuana'),
+('Marco', 'Salinas', 'marco.s@email.com', '1993-02-14', 'Otay'),
+('Valeria', 'Mendez', 'vale.m@email.com', '1997-06-20', 'Rosarito'),
+('Hector', 'Fuentes', 'hector.f@email.com', '1991-09-15', 'Centro'),
+('Adriana', 'Mora', 'adriana.m@email.com', '1988-04-22', 'Playas de Tijuana'),
+('Samuel', 'Ibarra', 'samuel.i@email.com', '2000-11-08', 'Macroplaza'),
+('Natalia', 'Pena', 'natalia.p@email.com', '1995-03-17', 'Otay'),
+('Ernesto', 'Delgado', 'ernesto.d@email.com', '1986-07-30', 'Rosarito'),
+('Monica', 'Vargas', 'monica.v@email.com', '1999-12-05', 'Centro'),
+('Arturo', 'Miranda', 'arturo.mi@email.com', '1990-05-25', 'Zona Rio'),
+('Fernanda', 'Soto', 'fernanda.s@email.com', '1994-08-11', 'Otay'),
+('Rodrigo', 'Ponce', 'rodrigo.p@email.com', '1987-01-19', 'Rosarito'),
+('Daniela', 'Aguirre', 'daniela.a@email.com', '2001-10-28', 'Centro'),
+('Gustavo', 'Cervantes', 'gustavo.c@email.com', '1992-06-14', 'Playas de Tijuana'),
+('Paola', 'Herrera', 'paola.h@email.com', '1996-02-03', 'Macroplaza'),
+('Ivan', 'Escobar', 'ivan.e@email.com', '1989-09-22', 'Otay'),
+('Alejandra', 'Leal', 'alejandra.l@email.com', '1998-04-07', 'Rosarito'),
+('Cesar', 'Rojas', 'cesar.r@email.com', '1993-11-16', 'Centro'),
+('Diana', 'Nunez', 'diana.n@email.com', '1985-07-29', 'Zona Rio'),
+('Omar', 'Castillo', 'omar.c@email.com', '2002-03-12', 'Otay'),
+('Lucia', 'Medina', 'lucia.me@email.com', '1997-08-24', 'Rosarito'),
+('Andres', 'Blanco', 'andres.b@email.com', '1991-05-06', 'Centro'),
+('Camila', 'Vega', 'camila.v@email.com', '1999-01-18', 'Playas de Tijuana'),
+('Felipe', 'Guerrero', 'felipe.g@email.com', '1988-10-31', 'Macroplaza'),
+('Karla', 'Zamora', 'karla.z@email.com', '1994-06-09', 'Otay'),
+('Bruno', 'Pacheco', 'bruno.p@email.com', '1986-02-21', 'Rosarito'),
+('Ximena', 'Acosta', 'ximena.a@email.com', '2000-09-04', 'Centro'),
+('Sergio', 'Perez', 'sergio.pe@email.com', '1993-04-17', 'Zona Rio'),
+('Alicia', 'Sandoval', 'alicia.s@email.com', '1990-11-30', 'Otay'),
+('Hugo', 'Contreras', 'hugo.co@email.com', '1987-07-13', 'Rosarito'),
+('Irene', 'Dominguez', 'irene.d@email.com', '1996-03-26', 'Centro'),
+('Martin', 'Espinoza', 'martin.e@email.com', '1984-12-08', 'Playas de Tijuana'),
+('Rebeca', 'Tapia', 'rebeca.t@email.com', '1998-08-21', 'Macroplaza'),
+('Joel', 'Rios', 'joel.r@email.com', '1992-05-04', 'Otay'),
+('Silvia', 'Leon', 'silvia.l@email.com', '1989-01-17', 'Rosarito'),
+('Enrique', 'Navarro', 'enrique.n@email.com', '1995-09-30', 'Centro'),
+('Verónica', 'Cruz', 'veronica.c@email.com', '1983-06-12', 'Zona Rio'),
+('Pablo', 'Cabrera', 'pablo.ca@email.com', '2001-02-25', 'Otay'),
+('Miriam', 'Ortega', 'miriam.o@email.com', '1997-10-08', 'Rosarito'),
+('Tomas', 'Villanueva', 'tomas.v@email.com', '1990-07-21', 'Centro'),
+('Gloria', 'Montoya', 'gloria.m@email.com', '1986-04-03', 'Playas de Tijuana'),
+('Nicolas', 'Paredes', 'nicolas.p@email.com', '1994-12-16', 'Macroplaza'),
+('Beatriz', 'Campos', 'beatriz.c@email.com', '1988-08-29', 'Otay'),
+('Roberto', 'Luna', 'roberto.l@email.com', '1999-05-11', 'Rosarito'),
+('Sandra', 'Aguilar', 'sandra.a@email.com', '1992-01-24', 'Centro'),
+('Eduardo', 'Reyes', 'eduardo.r@email.com', '1985-10-07', 'Zona Rio'),
+('Norma', 'Figueroa', 'norma.f@email.com', '1996-06-20', 'Otay'),
+('Miguel', 'Espino', 'miguel.es@email.com', '1993-02-02', 'Rosarito'),
+('Teresa', 'Mercado', 'teresa.m@email.com', '1989-09-15', 'Centro'),
+('Julio', 'Barrera', 'julio.b@email.com', '2000-05-28', 'Playas de Tijuana'),
+('Leticia', 'Duran', 'leticia.d@email.com', '1987-02-10', 'Macroplaza'),
+('Raul', 'Fuentes', 'raul.f@email.com', '1995-10-23', 'Otay'),
+('Patricia', 'Salazar', 'patricia.sa@email.com', '1991-07-06', 'Rosarito'),
+('Francisco', 'Peña', 'francisco.p@email.com', '1984-03-19', 'Centro'),
+('Claudia', 'Ibañez', 'claudia.i@email.com', '1998-11-01', 'Zona Rio'),
+('Alfonso', 'Montoya', 'alfonso.m@email.com', '1993-07-14', 'Otay'),
+('Graciela', 'Zavala', 'graciela.z@email.com', '1986-03-27', 'Rosarito'),
+('Leonardo', 'Rivas', 'leonardo.r@email.com', '1999-12-10', 'Centro'),
+('Marisol', 'Orozco', 'marisol.o@email.com', '1994-08-22', 'Playas de Tijuana'),
+('Ignacio', 'Palma', 'ignacio.p@email.com', '1988-05-05', 'Macroplaza'),
+('Yolanda', 'Serrano', 'yolanda.s@email.com', '1997-01-18', 'Otay'),
+('Alberto', 'Carrasco', 'alberto.c@email.com', '1990-09-30', 'Rosarito'),
+('Estela', 'Mendoza', 'estela.m@email.com', '1985-06-13', 'Centro'),
+('Mauricio', 'Salas', 'mauricio.s@email.com', '2001-02-26', 'Zona Rio'),
+('Carmen', 'Velazquez', 'carmen.v@email.com', '1996-10-08', 'Otay'),
+('Gerardo', 'Trejo', 'gerardo.t@email.com', '1992-06-21', 'Rosarito'),
+('Olivia', 'Quinones', 'olivia.q@email.com', '1989-03-04', 'Centro'),
+('Daniel', 'Arredondo', 'daniel.a@email.com', '1994-11-17', 'Playas de Tijuana'),
+('Susana', 'Meza', 'susana.m@email.com', '1987-07-30', 'Macroplaza'),
+('Victor', 'Cardenas', 'victor.ca@email.com', '1998-04-12', 'Otay'),
+('Rocio', 'Bravo', 'rocio.b@email.com', '1993-12-25', 'Rosarito'),
+('Alejandro', 'Galvan', 'alejandro.g@email.com', '1991-09-07', 'Centro'),
+('Margarita', 'Avila', 'margarita.a@email.com', '1986-05-20', 'Zona Rio'),
+('Ramiro', 'Cortes', 'ramiro.c@email.com', '1999-01-02', 'Otay'),
+('Esperanza', 'Palacios', 'esperanza.p@email.com', '1995-09-15', 'Rosarito'),
+('Cristian', 'Valdez', 'cristian.v@email.com', '1988-05-28', 'Centro'),
+('Lorena', 'Bustamante', 'lorena.b@email.com', '2000-02-10', 'Playas de Tijuana'),
+('Humberto', 'Cisneros', 'humberto.c@email.com', '1984-10-23', 'Macroplaza'),
+('Angelica', 'Arenas', 'angelica.a@email.com', '1997-07-05', 'Otay'),
+('Edmundo', 'Rosales', 'edmundo.r@email.com', '1992-03-18', 'Rosarito'),
+('Pilar', 'Rangel', 'pilar.r@email.com', '1989-11-30', 'Centro'),
+('Joaquin', 'Nava', 'joaquin.n@email.com', '1996-08-13', 'Zona Rio'),
+('Concepcion', 'Solis', 'conc.s@email.com', '1983-04-26', 'Otay'),
+('Ernesto', 'Lozano', 'ernesto.l@email.com', '2001-01-08', 'Rosarito');
+ 
+-- Tickets
+INSERT INTO Tickets (t_date, t_SalePrice, c_id, e_id, b_id) VALUES
+('2026-01-05 10:00:00', 1200.00, 16, 3, 1),
+('2026-01-06 11:30:00', 850.00, 17, 5, 2),
+('2026-01-07 12:15:00', 1500.00, 18, 7, 3),
+('2026-01-08 14:20:00', 900.00, 19, 9, 1),
+('2026-01-09 16:45:00', 1100.00, 20, 11, 2),
+('2026-01-10 09:30:00', 700.00, 21, 13, 3),
+('2026-01-11 13:10:00', 1400.00, 22, 15, 1),
+('2026-01-12 15:50:00', 850.00, 23, 17, 2),
+('2026-01-13 18:05:00', 1200.00, 24, 19, 3),
+('2026-01-14 10:20:00', 950.00, 25, 21, 1),
+('2026-01-15 11:00:00', 1300.00, 26, 23, 2),
+('2026-01-16 12:30:00', 800.00, 27, 25, 3),
+('2026-01-17 13:45:00', 1100.00, 28, 27, 1),
+('2026-01-18 14:15:00', 750.00, 29, 29, 2),
+('2026-01-19 15:00:00', 1500.00, 30, 30, 3),
+('2026-01-20 10:00:00', 900.00, 31, 3, 1),
+('2026-01-21 11:30:00', 1200.00, 32, 5, 2),
+('2026-01-22 12:15:00', 850.00, 33, 7, 3),
+('2026-01-23 14:20:00', 1400.00, 34, 9, 1),
+('2026-01-24 16:45:00', 700.00, 35, 11, 2),
+('2026-01-25 09:30:00', 1100.00, 36, 13, 3),
+('2026-01-26 13:10:00', 950.00, 37, 15, 1),
+('2026-01-27 15:50:00', 1300.00, 38, 17, 2),
+('2026-01-28 18:05:00', 800.00, 39, 19, 3),
+('2026-01-29 10:20:00', 1200.00, 40, 21, 1),
+('2026-01-30 11:00:00', 750.00, 41, 23, 2),
+('2026-02-01 12:30:00', 1500.00, 42, 25, 3),
+('2026-02-02 13:45:00', 900.00, 43, 27, 1),
+('2026-02-03 14:15:00', 1100.00, 44, 29, 2),
+('2026-02-04 15:00:00', 850.00, 45, 30, 3),
+('2026-02-05 10:00:00', 1400.00, 46, 3, 1),
+('2026-02-06 11:30:00', 700.00, 47, 5, 2),
+('2026-02-07 12:15:00', 1200.00, 48, 7, 3),
+('2026-02-08 14:20:00', 950.00, 49, 9, 1),
+('2026-02-09 16:45:00', 1300.00, 50, 11, 2),
+('2026-02-10 09:30:00', 800.00, 51, 13, 3),
+('2026-02-11 13:10:00', 1100.00, 52, 15, 1),
+('2026-02-12 15:50:00', 750.00, 53, 17, 2),
+('2026-02-13 18:05:00', 1500.00, 54, 19, 3),
+('2026-02-14 10:20:00', 900.00, 55, 21, 1),
+('2026-02-15 11:00:00', 1200.00, 56, 23, 2),
+('2026-02-16 12:30:00', 850.00, 57, 25, 3),
+('2026-02-17 13:45:00', 1400.00, 58, 27, 1),
+('2026-02-18 14:15:00', 700.00, 59, 29, 2),
+('2026-02-19 15:00:00', 1100.00, 60, 30, 3),
+('2026-02-20 10:00:00', 950.00, 61, 3, 1),
+('2026-02-21 11:30:00', 1300.00, 62, 5, 2),
+('2026-02-22 12:15:00', 800.00, 63, 7, 3),
+('2026-02-23 14:20:00', 1200.00, 64, 9, 1),
+('2026-02-24 16:45:00', 750.00, 65, 11, 2),
+('2026-02-25 09:30:00', 1500.00, 66, 13, 3),
+('2026-02-26 13:10:00', 900.00, 67, 15, 1),
+('2026-02-27 15:50:00', 1100.00, 68, 17, 2),
+('2026-02-28 18:05:00', 850.00, 69, 19, 3),
+('2026-03-01 10:20:00', 1400.00, 70, 21, 1),
+('2026-03-02 11:00:00', 700.00, 71, 23, 2),
+('2026-03-03 12:30:00', 1200.00, 72, 25, 3),
+('2026-03-04 13:45:00', 950.00, 73, 27, 1),
+('2026-03-05 14:15:00', 1300.00, 74, 29, 2),
+('2026-03-06 15:00:00', 800.00, 75, 30, 3),
+('2026-03-07 10:00:00', 1100.00, 76, 3, 1),
+('2026-03-08 11:30:00', 750.00, 77, 5, 2),
+('2026-03-09 12:15:00', 1500.00, 78, 7, 3),
+('2026-03-10 14:20:00', 900.00, 79, 9, 1),
+('2026-03-11 16:45:00', 1200.00, 80, 11, 2),
+('2026-03-12 09:30:00', 850.00, 81, 13, 3),
+('2026-03-13 13:10:00', 1400.00, 82, 15, 1),
+('2026-03-14 15:50:00', 700.00, 83, 17, 2),
+('2026-03-15 18:05:00', 1100.00, 84, 19, 3),
+('2026-03-16 10:20:00', 950.00, 85, 21, 1),
+('2026-03-17 11:00:00', 1300.00, 86, 23, 2),
+('2026-03-18 12:30:00', 800.00, 87, 25, 3),
+('2026-03-19 13:45:00', 1200.00, 88, 27, 1),
+('2026-03-20 14:15:00', 750.00, 89, 29, 2),
+('2026-03-20 15:00:00', 1500.00, 90, 30, 3),
+('2026-03-20 10:00:00', 900.00, 91, 3, 1),
+('2026-03-20 11:30:00', 1100.00, 92, 5, 2),
+('2026-03-20 12:15:00', 850.00, 93, 7, 3),
+('2026-03-20 14:20:00', 1400.00, 94, 9, 1),
+('2026-03-20 16:45:00', 700.00, 95, 11, 2),
+('2026-03-21 09:30:00', 1200.00, 96, 13, 3),
+('2026-03-21 13:10:00', 950.00, 97, 15, 1),
+('2026-03-21 15:50:00', 1300.00, 98, 17, 2),
+('2026-03-21 18:05:00', 800.00, 99, 19, 3),
+('2026-03-21 10:20:00', 1100.00, 100, 21, 1),
+('2026-03-21 11:00:00', 1200.00, 16, 23, 2),
+('2026-03-21 12:30:00', 750.00, 25, 25, 3),
+('2026-03-22 13:45:00', 1500.00, 35, 27, 1),
+('2026-03-22 14:15:00', 900.00, 45, 29, 2),
+('2026-03-22 15:00:00', 1100.00, 55, 30, 3),
+('2026-03-22 10:00:00', 850.00, 65, 3, 1),
+('2026-03-22 11:30:00', 1400.00, 75, 5, 2),
+('2026-03-22 12:15:00', 700.00, 85, 7, 3),
+('2026-03-22 14:20:00', 1200.00, 95, 9, 1),
+('2026-03-22 16:45:00', 950.00, 100, 11, 2),
+('2026-03-22 09:30:00', 1300.00, 1, 13, 3),
+('2026-03-22 13:10:00', 800.00, 5, 15, 1),
+('2026-03-22 15:50:00', 1100.00, 10, 17, 2),
+('2026-03-22 17:00:00', 1800.00, 1, 2, 1),
+('2026-03-22 18:00:00', 1300.00, 2, 4, 2),
+('2026-01-03 10:00:00', 1200.00, 1, 3, 1),
+('2026-01-10 14:30:00', 950.00, 1, 5, 2),
+('2026-01-17 11:00:00', 1500.00, 1, 7, 3),
+('2026-01-24 16:00:00', 800.00, 1, 9, 1),
+('2026-01-31 09:30:00', 1100.00, 1, 11, 2),
+('2026-03-14 14:00:00', 1200.00, 1, 23, 2),
+('2026-03-19 11:30:00', 750.00, 1, 25, 3),
+('2026-03-21 16:00:00', 1500.00, 1, 27, 1),
+('2026-03-22 08:00:00', 900.00, 1, 29, 2),
+('2026-03-22 19:00:00', 1100.00, 1, 30, 3),
+('2026-01-25 10:00:00', 750.00, 2, 9, 2),
+('2026-02-01 14:00:00', 1400.00, 2, 11, 3),
+('2026-02-08 09:30:00', 850.00, 2, 13, 1),
+('2026-02-15 11:00:00', 1200.00, 2, 15, 2),
+('2026-02-22 16:30:00', 700.00, 2, 17, 3),
+('2026-03-01 13:00:00', 1500.00, 2, 19, 1),
+('2026-03-08 10:45:00', 950.00, 2, 21, 2),
+('2026-03-15 14:30:00', 1300.00, 2, 23, 3),
+('2026-03-20 09:00:00', 800.00, 2, 25, 1),
+('2026-03-21 13:30:00', 1100.00, 2, 27, 2),
+('2026-03-22 07:30:00', 1000.00, 2, 29, 3),
+('2026-01-23 15:30:00', 950.00, 3, 9, 3),
+('2026-01-30 12:00:00', 1200.00, 3, 11, 1),
+('2026-02-06 09:00:00', 700.00, 3, 13, 2),
+('2026-02-13 14:15:00', 1300.00, 3, 15, 3),
+('2026-02-20 11:30:00', 850.00, 3, 17, 1),
+('2026-02-27 16:00:00', 1500.00, 3, 19, 2),
+('2026-03-06 10:00:00', 900.00, 3, 21, 3),
+('2026-03-13 13:45:00', 1100.00, 3, 23, 1),
+('2026-03-18 09:30:00', 750.00, 3, 25, 2),
+('2026-03-20 15:30:00', 1400.00, 3, 27, 3),
+('2026-03-22 06:30:00', 1000.00, 3, 29, 1),
+('2026-03-22 21:00:00', 1300.00, 3, 30, 2);
+
+-- Audit Log
+INSERT INTO Audit_Log (l_user, l_table, l_action) VALUES
+('Admin', 'Products', 'INSERT masivo de consolas'),
+('Admin', 'Clients', 'Carga inicial de clientes frecuentes'),
+('Admin', 'Employees', 'Alta de plantilla laboral'),
+('Sistema', 'Stock', 'Actualización de inventario inicial'),
+('Sistema', 'Tickets', 'Registro de ventas de apertura');
+
+
+-- Consolas
+INSERT INTO Consoles (con_name, con_price) VALUES
+('PlayStation 5', 10500.00),
+('PlayStation 5 Digital', 8500.00),
+('Xbox Series X', 10500.00),
+('Xbox Series S', 6500.00),
+('Nintendo Switch OLED', 7000.00),
+('Nintendo Switch', 5500.00),
+('Nintendo Switch Lite', 4000.00),
+('PlayStation 4 Slim', 5000.00),
+('Xbox One S', 4500.00),
+('Steam Deck', 12000.00),
+('Nintendo Switch 2', 9000.00),
+('PlayStation 5 Pro', 13000.00);
+
+-- Productos
+-- Categoría 1 Sports
+INSERT INTO Products (p_name, p_price, cat_id, s_id, con_id) VALUES
+('FIFA 26', 1300.00, 1, 4, 1),
+('FIFA 26', 1300.00, 1, 4, 3),
+('FIFA 26', 1300.00, 1, 4, 5),
+('NBA 2K26', 1300.00, 1, 5, 1),
+('NBA 2K26', 1300.00, 1, 5, 3),
+('NBA 2K26', 1300.00, 1, 5, 8),
+('WWE 2K26', 1300.00, 1, 5, 1),
+('WWE 2K26', 1300.00, 1, 5, 3),
+('WWE 2K26', 1300.00, 1, 5, 8),
+('Madden NFL 26', 1300.00, 1, 6, 1),
+('Madden NFL 26', 1300.00, 1, 6, 3),
+('Madden NFL 26', 1300.00, 1, 6, 4),
+('F1 25', 1200.00, 1, 5, 1),
+('F1 25', 1200.00, 1, 5, 3),
+('F1 25', 1200.00, 1, 5, 8),
+('Gran Turismo 7', 1300.00, 1, 5, 1),
+('Gran Turismo 7', 1300.00, 1, 5, 12),
+('Gran Turismo 7', 1300.00, 1, 5, 8),
+('Forza Horizon 6', 1400.00, 1, 6, 3),
+('Forza Horizon 6', 1400.00, 1, 6, 4),
+('Forza Horizon 6', 1400.00, 1, 6, 9),
+('Mario Kart World', 1300.00, 1, 4, 11),
+('Mario Kart World', 1300.00, 1, 4, 5),
+('Mario Kart World', 1300.00, 1, 4, 6),
+('Mario Tennis Fever', 1200.00, 1, 4, 11),
+('Mario Tennis Fever', 1200.00, 1, 4, 5),
+('Mario Tennis Fever', 1200.00, 1, 4, 6),
+('Mario Strikers Battle League', 1000.00, 1, 4, 5),
+('Mario Strikers Battle League', 1000.00, 1, 4, 6),
+('Mario Strikers Battle League', 1000.00, 1, 4, 7),
+('eFootball 2025', 800.00, 1, 5, 1),
+('eFootball 2025', 800.00, 1, 5, 3),
+('eFootball 2025', 800.00, 1, 5, 8),
+('MotoGP 25', 1100.00, 1, 5, 1),
+('MotoGP 25', 1100.00, 1, 5, 3),
+('MotoGP 25', 1100.00, 1, 5, 8),
+('NHL 25', 1100.00, 1, 6, 1),
+('NHL 25', 1100.00, 1, 6, 3),
+('NHL 25', 1100.00, 1, 6, 8),
+('UFC 5', 1200.00, 1, 5, 1),
+('UFC 5', 1200.00, 1, 5, 3),
+('UFC 5', 1200.00, 1, 5, 8),
+('PGA Tour 2K25', 1000.00, 1, 6, 1),
+('PGA Tour 2K25', 1000.00, 1, 6, 3),
+('PGA Tour 2K25', 1000.00, 1, 6, 8),
+('Riders Republic', 900.00, 1, 6, 1),
+('Riders Republic', 900.00, 1, 6, 3),
+('Riders Republic', 900.00, 1, 6, 8),
+('Tony Hawk Pro Skater 1+2', 900.00, 1, 6, 1),
+('Tony Hawk Pro Skater 1+2', 900.00, 1, 6, 3),
+('Tony Hawk Pro Skater 1+2', 900.00, 1, 6, 8),
+('Sonic Racing CrossWorlds', 1000.00, 1, 5, 1),
+('Sonic Racing CrossWorlds', 1000.00, 1, 5, 11),
+('Sonic Racing CrossWorlds', 1000.00, 1, 5, 5),
+('Football Manager 2025', 1000.00, 1, 6, 3),
+('Football Manager 2025', 1000.00, 1, 6, 4),
+('Football Manager 2025', 1000.00, 1, 6, 9),
+('MLB The Show 25', 1200.00, 1, 5, 1),
+('MLB The Show 25', 1200.00, 1, 5, 12),
+('MLB The Show 25', 1200.00, 1, 5, 8),
+('Steep', 700.00, 1, 6, 1),
+('Steep', 700.00, 1, 6, 3),
+('Steep', 700.00, 1, 6, 8),
+('Dirt 5', 900.00, 1, 6, 1),
+('Dirt 5', 900.00, 1, 6, 3),
+('Dirt 5', 900.00, 1, 6, 8),
+('Rocket League Collection', 700.00, 1, 5, 1),
+('Rocket League Collection', 700.00, 1, 5, 3),
+('Rocket League Collection', 700.00, 1, 5, 5),
+('Olympic Games Tokyo 2020', 700.00, 1, 4, 5),
+('Olympic Games Tokyo 2020', 700.00, 1, 4, 6),
+('Olympic Games Tokyo 2020', 700.00, 1, 4, 7),
+('Tennis World Tour 2', 800.00, 1, 6, 1),
+('Tennis World Tour 2', 800.00, 1, 6, 3),
+('Tennis World Tour 2', 800.00, 1, 6, 8);
+
+-- Categoría 2 Survival Horror
+INSERT INTO Products (p_name, p_price, cat_id, s_id, con_id) VALUES
+('Resident Evil Requiem', 1500.00, 2, 5, 1),
+('Resident Evil Requiem', 1500.00, 2, 5, 12),
+('Resident Evil Requiem', 1500.00, 2, 5, 3),
+('Silent Hill f', 1400.00, 2, 5, 1),
+('Silent Hill f', 1400.00, 2, 5, 3),
+('Silent Hill f', 1400.00, 2, 5, 8),
+('Reanimal', 1200.00, 2, 4, 11),
+('Reanimal', 1200.00, 2, 4, 5),
+('Reanimal', 1200.00, 2, 4, 6),
+('The Last of Us Part I', 1500.00, 2, 5, 1),
+('The Last of Us Part I', 1500.00, 2, 5, 12),
+('The Last of Us Part I', 1500.00, 2, 5, 8),
+('The Last of Us Part II Remastered', 1400.00, 2, 5, 1),
+('The Last of Us Part II Remastered', 1400.00, 2, 5, 12),
+('The Last of Us Part II Remastered', 1400.00, 2, 5, 8),
+('Alan Wake 2', 1300.00, 2, 6, 1),
+('Alan Wake 2', 1300.00, 2, 6, 3),
+('Alan Wake 2', 1300.00, 2, 6, 4),
+('Dead Space Remake', 1300.00, 2, 6, 1),
+('Dead Space Remake', 1300.00, 2, 6, 3),
+('Dead Space Remake', 1300.00, 2, 6, 8),
+('Resident Evil 4 Remake', 1400.00, 2, 5, 1),
+('Resident Evil 4 Remake', 1400.00, 2, 5, 3),
+('Resident Evil 4 Remake', 1400.00, 2, 5, 8),
+('Resident Evil Village', 1200.00, 2, 5, 1),
+('Resident Evil Village', 1200.00, 2, 5, 3),
+('Resident Evil Village', 1200.00, 2, 5, 8),
+('Outlast Trials', 900.00, 2, 6, 1),
+('Outlast Trials', 900.00, 2, 6, 3),
+('Outlast Trials', 900.00, 2, 6, 8),
+('Little Nightmares II', 800.00, 2, 4, 5),
+('Little Nightmares II', 800.00, 2, 4, 1),
+('Little Nightmares II', 800.00, 2, 4, 8),
+('Amnesia The Bunker', 700.00, 2, 6, 1),
+('Amnesia The Bunker', 700.00, 2, 6, 3),
+('Amnesia The Bunker', 700.00, 2, 6, 8),
+('Dying Light 2', 1200.00, 2, 6, 1),
+('Dying Light 2', 1200.00, 2, 6, 3),
+('Dying Light 2', 1200.00, 2, 6, 8),
+('Back 4 Blood', 900.00, 2, 6, 1),
+('Back 4 Blood', 900.00, 2, 6, 3),
+('Back 4 Blood', 900.00, 2, 6, 8),
+('Pathologic 3', 1100.00, 2, 6, 1),
+('Pathologic 3', 1100.00, 2, 6, 3),
+('Pathologic 3', 1100.00, 2, 6, 4),
+('Evil Dead The Game', 800.00, 2, 6, 1),
+('Evil Dead The Game', 800.00, 2, 6, 3),
+('Evil Dead The Game', 800.00, 2, 6, 8),
+('Man of Medan', 800.00, 2, 5, 1),
+('Man of Medan', 800.00, 2, 5, 3),
+('Man of Medan', 800.00, 2, 5, 8),
+('Little Hope', 800.00, 2, 5, 1),
+('Little Hope', 800.00, 2, 5, 3),
+('Little Hope', 800.00, 2, 5, 8),
+('House of Ashes', 900.00, 2, 5, 1),
+('House of Ashes', 900.00, 2, 5, 3),
+('House of Ashes', 900.00, 2, 5, 8),
+('The Devil in Me', 900.00, 2, 5, 1),
+('The Devil in Me', 900.00, 2, 5, 3),
+('The Devil in Me', 900.00, 2, 5, 8),
+('Signalis', 650.00, 2, 6, 3),
+('Signalis', 650.00, 2, 6, 5),
+('Signalis', 650.00, 2, 6, 1),
+('Maid of Sker', 700.00, 2, 6, 1),
+('Maid of Sker', 700.00, 2, 6, 3),
+('Maid of Sker', 700.00, 2, 6, 8),
+('Carrion', 600.00, 2, 6, 3),
+('Carrion', 600.00, 2, 6, 5),
+('Carrion', 600.00, 2, 6, 1),
+('Song of Horror', 700.00, 2, 6, 1),
+('Song of Horror', 700.00, 2, 6, 3),
+('Song of Horror', 700.00, 2, 6, 8),
+('Observer System Redux', 700.00, 2, 6, 1),
+('Observer System Redux', 700.00, 2, 6, 3),
+('Observer System Redux', 700.00, 2, 6, 8);
+
+-- Categoría 3 Adventure
+INSERT INTO Products (p_name, p_price, cat_id, s_id, con_id) VALUES
+('GTA VI', 1800.00, 3, 6, 1),
+('GTA VI', 1800.00, 3, 6, 3),
+('GTA VI', 1800.00, 3, 6, 12),
+('Marvel Wolverine', 1500.00, 3, 5, 1),
+('Marvel Wolverine', 1500.00, 3, 5, 12),
+('Marvel Wolverine', 1500.00, 3, 5, 2),
+('007 First Light', 1400.00, 3, 5, 1),
+('007 First Light', 1400.00, 3, 5, 3),
+('007 First Light', 1400.00, 3, 5, 8),
+('Pragmata', 1400.00, 3, 5, 1),
+('Pragmata', 1400.00, 3, 5, 3),
+('Pragmata', 1400.00, 3, 5, 8),
+('Assassins Creed Shadows', 1400.00, 3, 6, 1),
+('Assassins Creed Shadows', 1400.00, 3, 6, 3),
+('Assassins Creed Shadows', 1400.00, 3, 6, 8),
+('God of War Ragnarok', 1500.00, 3, 5, 1),
+('God of War Ragnarok', 1500.00, 3, 5, 12),
+('God of War Ragnarok', 1500.00, 3, 5, 8),
+('Spider-Man 2', 1500.00, 3, 5, 1),
+('Spider-Man 2', 1500.00, 3, 5, 12),
+('Spider-Man 2', 1500.00, 3, 5, 2),
+('Ghost of Tsushima', 1300.00, 3, 5, 1),
+('Ghost of Tsushima', 1300.00, 3, 5, 12),
+('Ghost of Tsushima', 1300.00, 3, 5, 8),
+('Horizon Forbidden West', 1300.00, 3, 5, 1),
+('Horizon Forbidden West', 1300.00, 3, 5, 12),
+('Horizon Forbidden West', 1300.00, 3, 5, 8),
+('Zelda Tears of the Kingdom', 1400.00, 3, 4, 5),
+('Zelda Tears of the Kingdom', 1400.00, 3, 4, 6),
+('Zelda Tears of the Kingdom', 1400.00, 3, 4, 7),
+('Big Hops', 1100.00, 3, 5, 1),
+('Big Hops', 1100.00, 3, 5, 12),
+('Big Hops', 1100.00, 3, 5, 3),
+('Yakuza Kiwami 3', 1200.00, 3, 5, 1),
+('Yakuza Kiwami 3', 1200.00, 3, 5, 3),
+('Yakuza Kiwami 3', 1200.00, 3, 5, 8),
+('A Plague Tale Requiem', 1200.00, 3, 6, 1),
+('A Plague Tale Requiem', 1200.00, 3, 6, 3),
+('A Plague Tale Requiem', 1200.00, 3, 6, 4),
+('Stray', 700.00, 3, 5, 1),
+('Stray', 700.00, 3, 5, 8),
+('Stray', 700.00, 3, 5, 3),
+('It Takes Two', 900.00, 3, 6, 1),
+('It Takes Two', 900.00, 3, 6, 3),
+('It Takes Two', 900.00, 3, 6, 8),
+('Kena Bridge of Spirits', 800.00, 3, 5, 1),
+('Kena Bridge of Spirits', 800.00, 3, 5, 12),
+('Kena Bridge of Spirits', 800.00, 3, 5, 3),
+('Ratchet and Clank Rift Apart', 1300.00, 3, 5, 1),
+('Ratchet and Clank Rift Apart', 1300.00, 3, 5, 12),
+('Ratchet and Clank Rift Apart', 1300.00, 3, 5, 2),
+('Astro Bot', 1200.00, 3, 5, 1),
+('Astro Bot', 1200.00, 3, 5, 12),
+('Astro Bot', 1200.00, 3, 5, 2),
+('Death Stranding 2', 1500.00, 3, 5, 1),
+('Death Stranding 2', 1500.00, 3, 5, 12),
+('Death Stranding 2', 1500.00, 3, 5, 3),
+('Control Ultimate Edition', 900.00, 3, 6, 1),
+('Control Ultimate Edition', 900.00, 3, 6, 3),
+('Control Ultimate Edition', 900.00, 3, 6, 8),
+('Ghostwire Tokyo', 1000.00, 3, 5, 1),
+('Ghostwire Tokyo', 1000.00, 3, 5, 3),
+('Ghostwire Tokyo', 1000.00, 3, 5, 8),
+('Far Cry 6', 1000.00, 3, 6, 1),
+('Far Cry 6', 1000.00, 3, 6, 3),
+('Far Cry 6', 1000.00, 3, 6, 8),
+('Watch Dogs Legion', 900.00, 3, 6, 1),
+('Watch Dogs Legion', 900.00, 3, 6, 3),
+('Watch Dogs Legion', 900.00, 3, 6, 8),
+('Immortals Fenyx Rising', 900.00, 3, 6, 1),
+('Immortals Fenyx Rising', 900.00, 3, 6, 5),
+('Immortals Fenyx Rising', 900.00, 3, 6, 3),
+('Sackboy A Big Adventure', 1000.00, 3, 5, 1),
+('Sackboy A Big Adventure', 1000.00, 3, 5, 8),
+('Sackboy A Big Adventure', 1000.00, 3, 5, 12);
+
+-- Categoría 4 RPG
+INSERT INTO Products (p_name, p_price, cat_id, s_id, con_id) VALUES
+('Clair Obscur Expedition 33', 1400.00, 4, 5, 1),
+('Clair Obscur Expedition 33', 1400.00, 4, 5, 3),
+('Clair Obscur Expedition 33', 1400.00, 4, 5, 4),
+('Elden Ring Nightreign', 1400.00, 4, 2, 1),
+('Elden Ring Nightreign', 1400.00, 4, 2, 3),
+('Elden Ring Nightreign', 1400.00, 4, 2, 8),
+('Nioh 3', 1400.00, 4, 4, 1),
+('Nioh 3', 1400.00, 4, 4, 12),
+('Nioh 3', 1400.00, 4, 4, 8),
+('Final Fantasy Tactics Ivalice Chronicles', 1300.00, 4, 4, 1),
+('Final Fantasy Tactics Ivalice Chronicles', 1300.00, 4, 4, 11),
+('Final Fantasy Tactics Ivalice Chronicles', 1300.00, 4, 4, 5),
+('Baldurs Gate 3', 1400.00, 4, 6, 1),
+('Baldurs Gate 3', 1400.00, 4, 6, 3),
+('Baldurs Gate 3', 1400.00, 4, 6, 8),
+('Hades II', 1200.00, 4, 6, 1),
+('Hades II', 1200.00, 4, 6, 3),
+('Hades II', 1200.00, 4, 6, 5),
+('Citizen Sleeper 2', 900.00, 4, 6, 3),
+('Citizen Sleeper 2', 900.00, 4, 6, 5),
+('Citizen Sleeper 2', 900.00, 4, 6, 1),
+('Dragon Age Veilguard', 1300.00, 4, 6, 1),
+('Dragon Age Veilguard', 1300.00, 4, 6, 3),
+('Dragon Age Veilguard', 1300.00, 4, 6, 8),
+('Cyberpunk 2077 Phantom Liberty', 1300.00, 4, 6, 1),
+('Cyberpunk 2077 Phantom Liberty', 1300.00, 4, 6, 3),
+('Cyberpunk 2077 Phantom Liberty', 1300.00, 4, 6, 8),
+('Persona 5 Royal', 1200.00, 4, 5, 1),
+('Persona 5 Royal', 1200.00, 4, 5, 8),
+('Persona 5 Royal', 1200.00, 4, 5, 5),
+('Elden Ring', 1400.00, 4, 2, 1),
+('Elden Ring', 1400.00, 4, 2, 3),
+('Elden Ring', 1400.00, 4, 2, 8),
+('Dark Souls III', 1100.00, 4, 2, 8),
+('Dark Souls III', 1100.00, 4, 2, 9),
+('Dark Souls III', 1100.00, 4, 2, 1),
+('Sekiro Shadows Die Twice', 1200.00, 4, 2, 8),
+('Sekiro Shadows Die Twice', 1200.00, 4, 2, 9),
+('Sekiro Shadows Die Twice', 1200.00, 4, 2, 1),
+('Monster Hunter Wilds', 1500.00, 4, 5, 1),
+('Monster Hunter Wilds', 1500.00, 4, 5, 3),
+('Monster Hunter Wilds', 1500.00, 4, 5, 8),
+('Pokemon Scarlet', 1200.00, 4, 4, 5),
+('Pokemon Scarlet', 1200.00, 4, 4, 6),
+('Pokemon Scarlet', 1200.00, 4, 4, 7),
+('Pokemon Violet', 1200.00, 4, 4, 5),
+('Pokemon Violet', 1200.00, 4, 4, 6),
+('Pokemon Violet', 1200.00, 4, 4, 7),
+('Fire Emblem Engage', 1100.00, 4, 4, 5),
+('Fire Emblem Engage', 1100.00, 4, 4, 6),
+('Fire Emblem Engage', 1100.00, 4, 4, 7),
+('Xenoblade Chronicles 3', 1100.00, 4, 4, 5),
+('Xenoblade Chronicles 3', 1100.00, 4, 4, 6),
+('Xenoblade Chronicles 3', 1100.00, 4, 4, 11),
+('Tales of Arise', 1200.00, 4, 4, 1),
+('Tales of Arise', 1200.00, 4, 4, 3),
+('Tales of Arise', 1200.00, 4, 4, 8),
+('Octopath Traveler II', 1000.00, 4, 4, 5),
+('Octopath Traveler II', 1000.00, 4, 4, 11),
+('Octopath Traveler II', 1000.00, 4, 4, 1),
+('Star Wars Jedi Survivor', 1300.00, 4, 6, 1),
+('Star Wars Jedi Survivor', 1300.00, 4, 6, 3),
+('Star Wars Jedi Survivor', 1300.00, 4, 6, 8),
+('Mass Effect Legendary', 1100.00, 4, 6, 1),
+('Mass Effect Legendary', 1100.00, 4, 6, 3),
+('Mass Effect Legendary', 1100.00, 4, 6, 8),
+('The Witcher 3 Next Gen', 1200.00, 4, 6, 1),
+('The Witcher 3 Next Gen', 1200.00, 4, 6, 3),
+('The Witcher 3 Next Gen', 1200.00, 4, 6, 8),
+('Diablo IV', 1300.00, 4, 6, 1),
+('Diablo IV', 1300.00, 4, 6, 3),
+('Diablo IV', 1300.00, 4, 6, 8),
+('Like a Dragon Ishin', 1100.00, 4, 5, 1),
+('Like a Dragon Ishin', 1100.00, 4, 5, 3),
+('Like a Dragon Ishin', 1100.00, 4, 5, 8);
+
+-- Categoría 5 Terror
+INSERT INTO Products (p_name, p_price, cat_id, s_id, con_id) VALUES
+('Until Dawn Remake', 1200.00, 5, 5, 1),
+('Until Dawn Remake', 1200.00, 5, 5, 12),
+('Until Dawn Remake', 1200.00, 5, 5, 3),
+('The Seance of Blake Manor', 1100.00, 5, 5, 1),
+('The Seance of Blake Manor', 1100.00, 5, 5, 12),
+('The Seance of Blake Manor', 1100.00, 5, 5, 3),
+('Phasmophobia', 700.00, 5, 6, 1),
+('Phasmophobia', 700.00, 5, 6, 3),
+('Phasmophobia', 700.00, 5, 6, 8),
+('Layers of Fear', 800.00, 5, 5, 1),
+('Layers of Fear', 800.00, 5, 5, 3),
+('Layers of Fear', 800.00, 5, 5, 8),
+('The Dark Pictures Anthology', 900.00, 5, 5, 1),
+('The Dark Pictures Anthology', 900.00, 5, 5, 3),
+('The Dark Pictures Anthology', 900.00, 5, 5, 8),
+('Five Nights at Freddys Security Breach', 900.00, 5, 5, 1),
+('Five Nights at Freddys Security Breach', 900.00, 5, 5, 3),
+('Five Nights at Freddys Security Breach', 900.00, 5, 5, 8),
+('Alien Isolation', 800.00, 5, 6, 8),
+('Alien Isolation', 800.00, 5, 6, 9),
+('Alien Isolation', 800.00, 5, 6, 1),
+('Prey', 900.00, 5, 6, 8),
+('Prey', 900.00, 5, 6, 9),
+('Prey', 900.00, 5, 6, 1),
+('Martha is Dead', 800.00, 5, 6, 1),
+('Martha is Dead', 800.00, 5, 6, 3),
+('Martha is Dead', 800.00, 5, 6, 8),
+('The Medium', 900.00, 5, 6, 3),
+('The Medium', 900.00, 5, 6, 4),
+('The Medium', 900.00, 5, 6, 1),
+('Visage', 700.00, 5, 6, 1),
+('Visage', 700.00, 5, 6, 3),
+('Visage', 700.00, 5, 6, 8),
+('Soma', 700.00, 5, 6, 8),
+('Soma', 700.00, 5, 6, 9),
+('Soma', 700.00, 5, 6, 1),
+('Superliminal', 600.00, 5, 6, 1),
+('Superliminal', 600.00, 5, 6, 5),
+('Superliminal', 600.00, 5, 6, 3),
+('Dredge', 700.00, 5, 6, 1),
+('Dredge', 700.00, 5, 6, 5),
+('Dredge', 700.00, 5, 6, 3),
+('Poppy Playtime', 600.00, 5, 6, 1),
+('Poppy Playtime', 600.00, 5, 6, 3),
+('Poppy Playtime', 600.00, 5, 6, 8),
+('Sons of the Forest', 800.00, 5, 6, 1),
+('Sons of the Forest', 800.00, 5, 6, 3),
+('Sons of the Forest', 800.00, 5, 6, 8),
+('The Forest', 700.00, 5, 6, 8),
+('The Forest', 700.00, 5, 6, 9),
+('The Forest', 700.00, 5, 6, 1),
+('Grounded', 800.00, 5, 6, 3),
+('Grounded', 800.00, 5, 6, 4),
+('Grounded', 800.00, 5, 6, 1),
+('Subnautica Below Zero', 700.00, 5, 6, 1),
+('Subnautica Below Zero', 700.00, 5, 6, 3),
+('Subnautica Below Zero', 700.00, 5, 6, 8),
+('Bendy and the Ink Machine', 600.00, 5, 6, 8),
+('Bendy and the Ink Machine', 600.00, 5, 6, 9),
+('Bendy and the Ink Machine', 600.00, 5, 6, 1),
+('Inscryption', 650.00, 5, 6, 3),
+('Inscryption', 650.00, 5, 6, 5),
+('Inscryption', 650.00, 5, 6, 1),
+('Mundaun', 650.00, 5, 6, 1),
+('Mundaun', 650.00, 5, 6, 3),
+('Mundaun', 650.00, 5, 6, 8),
+('Tormented Souls', 700.00, 5, 5, 1),
+('Tormented Souls', 700.00, 5, 5, 3),
+('Tormented Souls', 700.00, 5, 5, 8),
+('Hellblade Senuas Sacrifice', 900.00, 5, 6, 1),
+('Hellblade Senuas Sacrifice', 900.00, 5, 6, 3),
+('Hellblade Senuas Sacrifice', 900.00, 5, 6, 8),
+('Remothered Broken Porcelain', 650.00, 5, 5, 8),
+('Remothered Broken Porcelain', 650.00, 5, 5, 9),
+('Remothered Broken Porcelain', 650.00, 5, 5, 1);
+
+-- Categoría 6 Arcade
+INSERT INTO Products (p_name, p_price, cat_id, s_id, con_id) VALUES
+('Mortal Kombat Legacy Kollection', 1100.00, 6, 6, 1),
+('Mortal Kombat Legacy Kollection', 1100.00, 6, 6, 3),
+('Mortal Kombat Legacy Kollection', 1100.00, 6, 6, 8),
+('Street Fighter 6', 1200.00, 6, 5, 1),
+('Street Fighter 6', 1200.00, 6, 5, 3),
+('Street Fighter 6', 1200.00, 6, 5, 8),
+('Tekken 8', 1300.00, 6, 4, 1),
+('Tekken 8', 1300.00, 6, 4, 3),
+('Tekken 8', 1300.00, 6, 4, 8),
+('Dragon Ball FighterZ', 900.00, 6, 4, 1),
+('Dragon Ball FighterZ', 900.00, 6, 4, 3),
+('Dragon Ball FighterZ', 900.00, 6, 4, 5),
+('Guilty Gear Strive', 1000.00, 6, 5, 1),
+('Guilty Gear Strive', 1000.00, 6, 5, 3),
+('Guilty Gear Strive', 1000.00, 6, 5, 8),
+('Hollow Knight Silksong', 900.00, 6, 3, 11),
+('Hollow Knight Silksong', 900.00, 6, 3, 3),
+('Hollow Knight Silksong', 900.00, 6, 3, 1),
+('Cuphead The Delicious Last Course', 500.00, 6, 6, 3),
+('Cuphead The Delicious Last Course', 500.00, 6, 6, 5),
+('Cuphead The Delicious Last Course', 500.00, 6, 6, 1),
+('Sonic Superstars', 1000.00, 6, 5, 1),
+('Sonic Superstars', 1000.00, 6, 5, 5),
+('Sonic Superstars', 1000.00, 6, 5, 3),
+('Crash Bandicoot 4', 900.00, 6, 5, 1),
+('Crash Bandicoot 4', 900.00, 6, 5, 3),
+('Crash Bandicoot 4', 900.00, 6, 5, 8),
+('Kirby Forgotten Land', 1100.00, 6, 4, 5),
+('Kirby Forgotten Land', 1100.00, 6, 4, 11),
+('Kirby Forgotten Land', 1100.00, 6, 4, 6),
+('Donkey Kong Bananza', 1200.00, 6, 4, 11),
+('Donkey Kong Bananza', 1200.00, 6, 4, 5),
+('Donkey Kong Bananza', 1200.00, 6, 4, 6),
+('New Super Mario Bros U Deluxe', 1000.00, 6, 4, 5),
+('New Super Mario Bros U Deluxe', 1000.00, 6, 4, 6),
+('New Super Mario Bros U Deluxe', 1000.00, 6, 4, 7),
+('Yoshi Crafted World', 900.00, 6, 4, 5),
+('Yoshi Crafted World', 900.00, 6, 4, 6),
+('Yoshi Crafted World', 900.00, 6, 4, 7),
+('Celeste', 600.00, 6, 6, 5),
+('Celeste', 600.00, 6, 6, 3),
+('Celeste', 600.00, 6, 6, 1),
+('Shovel Knight Treasure Trove', 700.00, 6, 6, 5),
+('Shovel Knight Treasure Trove', 700.00, 6, 6, 3),
+('Shovel Knight Treasure Trove', 700.00, 6, 6, 1),
+('Ori and the Will of the Wisps', 700.00, 6, 6, 3),
+('Ori and the Will of the Wisps', 700.00, 6, 6, 4),
+('Ori and the Will of the Wisps', 700.00, 6, 6, 1),
+('Rayman Legends', 650.00, 6, 6, 1),
+('Rayman Legends', 650.00, 6, 6, 5),
+('Rayman Legends', 650.00, 6, 6, 3),
+('Wario Ware Get it Together', 850.00, 6, 4, 5),
+('Wario Ware Get it Together', 850.00, 6, 4, 6),
+('Wario Ware Get it Together', 850.00, 6, 4, 7),
+('Contra Anniversary Collection', 600.00, 6, 6, 8),
+('Contra Anniversary Collection', 600.00, 6, 6, 9),
+('Contra Anniversary Collection', 600.00, 6, 6, 5),
+('Metal Slug Anthology', 650.00, 6, 4, 5),
+('Metal Slug Anthology', 650.00, 6, 4, 6),
+('Metal Slug Anthology', 650.00, 6, 4, 7),
+('Mega Man 11', 700.00, 6, 5, 1),
+('Mega Man 11', 700.00, 6, 5, 3),
+('Mega Man 11', 700.00, 6, 5, 5),
+('Castlevania Anniversary Collection', 600.00, 6, 6, 5),
+('Castlevania Anniversary Collection', 600.00, 6, 6, 3),
+('Castlevania Anniversary Collection', 600.00, 6, 6, 1),
+('Pac-Man 99', 500.00, 6, 4, 5),
+('Pac-Man 99', 500.00, 6, 4, 6),
+('Pac-Man 99', 500.00, 6, 4, 7),
+('Rift of the NecroDancer', 700.00, 6, 6, 11),
+('Rift of the NecroDancer', 700.00, 6, 6, 3),
+('Rift of the NecroDancer', 700.00, 6, 6, 1),
+('Mighty Morphin Power Rangers Ritas Rewind', 800.00, 6, 6, 1),
+('Mighty Morphin Power Rangers Ritas Rewind', 800.00, 6, 6, 3),
+('Mighty Morphin Power Rangers Ritas Rewind', 800.00, 6, 6, 5);
+
+-- Categoría 7 Shooter
+INSERT INTO Products (p_name, p_price, cat_id, s_id, con_id) VALUES
+('Marathon', 1400.00, 7, 5, 1),
+('Marathon', 1400.00, 7, 5, 12),
+('Marathon', 1400.00, 7, 5, 3),
+('Halo Infinite', 1200.00, 7, 6, 3),
+('Halo Infinite', 1200.00, 7, 6, 4),
+('Halo Infinite', 1200.00, 7, 6, 9),
+('Call of Duty Black Ops 6', 1500.00, 7, 6, 1),
+('Call of Duty Black Ops 6', 1500.00, 7, 6, 3),
+('Call of Duty Black Ops 6', 1500.00, 7, 6, 8),
+('Battlefield 2025', 1300.00, 7, 6, 1),
+('Battlefield 2025', 1300.00, 7, 6, 3),
+('Battlefield 2025', 1300.00, 7, 6, 8),
+('Doom The Dark Ages', 1300.00, 7, 6, 1),
+('Doom The Dark Ages', 1300.00, 7, 6, 3),
+('Doom The Dark Ages', 1300.00, 7, 6, 8),
+('Splatoon 3', 1100.00, 7, 4, 5),
+('Splatoon 3', 1100.00, 7, 4, 11),
+('Splatoon 3', 1100.00, 7, 4, 6),
+('ARC Raiders', 1200.00, 7, 6, 1),
+('ARC Raiders', 1200.00, 7, 6, 3),
+('ARC Raiders', 1200.00, 7, 6, 8),
+('Titanfall 2', 800.00, 7, 6, 8),
+('Titanfall 2', 800.00, 7, 6, 9),
+('Titanfall 2', 800.00, 7, 6, 1),
+('Deathloop', 1100.00, 7, 5, 1),
+('Deathloop', 1100.00, 7, 5, 3),
+('Deathloop', 1100.00, 7, 5, 8),
+('Ghostrunner 2', 1000.00, 7, 6, 1),
+('Ghostrunner 2', 1000.00, 7, 6, 3),
+('Ghostrunner 2', 1000.00, 7, 6, 8),
+('Returnal', 1300.00, 7, 5, 1),
+('Returnal', 1300.00, 7, 5, 12),
+('Returnal', 1300.00, 7, 5, 2),
+('Wolfenstein II New Colossus', 900.00, 7, 6, 8),
+('Wolfenstein II New Colossus', 900.00, 7, 6, 9),
+('Wolfenstein II New Colossus', 900.00, 7, 6, 1),
+('Metro Exodus', 1000.00, 7, 6, 1),
+('Metro Exodus', 1000.00, 7, 6, 3),
+('Metro Exodus', 1000.00, 7, 6, 8),
+('Borderlands 3', 1000.00, 7, 6, 1),
+('Borderlands 3', 1000.00, 7, 6, 3),
+('Borderlands 3', 1000.00, 7, 6, 8),
+('Tiny Tinas Wonderlands', 1100.00, 7, 6, 1),
+('Tiny Tinas Wonderlands', 1100.00, 7, 6, 3),
+('Tiny Tinas Wonderlands', 1100.00, 7, 6, 8),
+('Neon White', 800.00, 7, 4, 5),
+('Neon White', 800.00, 7, 4, 11),
+('Neon White', 800.00, 7, 4, 3),
+('Turbo Overkill', 750.00, 7, 6, 1),
+('Turbo Overkill', 750.00, 7, 6, 3),
+('Turbo Overkill', 750.00, 7, 6, 8),
+('Ultrakill', 700.00, 7, 6, 3),
+('Ultrakill', 700.00, 7, 6, 4),
+('Ultrakill', 700.00, 7, 6, 1),
+('Ion Fury', 700.00, 7, 6, 1),
+('Ion Fury', 700.00, 7, 6, 3),
+('Ion Fury', 700.00, 7, 6, 8),
+('Bioshock Collection', 1000.00, 7, 6, 8),
+('Bioshock Collection', 1000.00, 7, 6, 9),
+('Bioshock Collection', 1000.00, 7, 6, 1),
+('Far Cry 5', 900.00, 7, 6, 8),
+('Far Cry 5', 900.00, 7, 6, 9),
+('Far Cry 5', 900.00, 7, 6, 1),
+('Superhot Mind Control Delete', 750.00, 7, 6, 3),
+('Superhot Mind Control Delete', 750.00, 7, 6, 5),
+('Superhot Mind Control Delete', 750.00, 7, 6, 1),
+('Apex Legends Collection', 600.00, 7, 5, 1),
+('Apex Legends Collection', 600.00, 7, 5, 3),
+('Apex Legends Collection', 600.00, 7, 5, 8),
+('Overwatch 2 Pack', 600.00, 7, 6, 1),
+('Overwatch 2 Pack', 600.00, 7, 6, 3),
+('Overwatch 2 Pack', 600.00, 7, 6, 8),
+('Fortnite Pack', 500.00, 7, 5, 1),
+('Fortnite Pack', 500.00, 7, 5, 5),
+('Fortnite Pack', 500.00, 7, 5, 3);
+
+-- INSERTS a STOCK por ID del producto/consola, Sucursal y Cantidad de copias
+-- Stock Consolas (con_id 1 al 12, st_quantity entre 5 y 10)
+INSERT INTO Stock (p_id, b_id, st_quantity) VALUES
+-- Consolas (1-12)
+(1, 1, 7), (1, 2, 5), (1, 3, 8),
+(2, 1, 6), (2, 2, 8), (2, 3, 5),
+(3, 1, 8), (3, 2, 6), (3, 3, 7),
+(4, 1, 9), (4, 2, 7), (4, 3, 6),
+(5, 1, 7), (5, 2, 9), (5, 3, 8),
+(6, 1, 8), (6, 2, 6), (6, 3, 9),
+(7, 1, 6), (7, 2, 8), (7, 3, 5),
+(8, 1, 5), (8, 2, 7), (8, 3, 6),
+(9, 1, 7), (9, 2, 5), (9, 3, 8),
+(10, 1, 6), (10, 2, 8), (10, 3, 7),
+(11, 1, 9), (11, 2, 7), (11, 3, 6),
+(12, 1, 5), (12, 2, 6), (12, 3, 8),
+-- Sports (13-87)
+(13, 1, 15), (13, 2, 12), (13, 3, 17),
+(14, 1, 18), (14, 2, 14), (14, 3, 11),
+(15, 1, 11), (15, 2, 17), (15, 3, 13),
+(16, 1, 13), (16, 2, 19), (16, 3, 15),
+(17, 1, 16), (17, 2, 11), (17, 3, 18),
+(18, 1, 14), (18, 2, 18), (18, 3, 12),
+(19, 1, 12), (19, 2, 15), (19, 3, 19),
+(20, 1, 17), (20, 2, 13), (20, 3, 10),
+(21, 1, 10), (21, 2, 16), (21, 3, 14),
+(22, 1, 19), (22, 2, 12), (22, 3, 17),
+(23, 1, 14), (23, 2, 10), (23, 3, 13),
+(24, 1, 11), (24, 2, 18), (24, 3, 16),
+(25, 1, 16), (25, 2, 13), (25, 3, 11),
+(26, 1, 15), (26, 2, 11), (26, 3, 18),
+(27, 1, 12), (27, 2, 17), (27, 3, 14),
+(28, 1, 18), (28, 2, 14), (28, 3, 19),
+(29, 1, 13), (29, 2, 19), (29, 3, 12),
+(30, 1, 10), (30, 2, 15), (30, 3, 17),
+(31, 1, 17), (31, 2, 12), (31, 3, 10),
+(32, 1, 14), (32, 2, 10), (32, 3, 15),
+(33, 1, 11), (33, 2, 16), (33, 3, 13),
+(34, 1, 19), (34, 2, 13), (34, 3, 18),
+(35, 1, 15), (35, 2, 18), (35, 3, 11),
+(36, 1, 12), (36, 2, 11), (36, 3, 16),
+(37, 1, 16), (37, 2, 14), (37, 3, 12),
+(38, 1, 13), (38, 2, 17), (38, 3, 19),
+(39, 1, 10), (39, 2, 15), (39, 3, 14),
+(40, 1, 18), (40, 2, 12), (40, 3, 11),
+(41, 1, 14), (41, 2, 19), (41, 3, 17),
+(42, 1, 11), (42, 2, 16), (42, 3, 13),
+(43, 1, 17), (43, 2, 13), (43, 3, 10),
+(44, 1, 15), (44, 2, 10), (44, 3, 18),
+(45, 1, 12), (45, 2, 18), (45, 3, 15),
+(46, 1, 19), (46, 2, 14), (46, 3, 12),
+(47, 1, 13), (47, 2, 11), (47, 3, 16),
+(48, 1, 16), (48, 2, 17), (48, 3, 14),
+(49, 1, 10), (49, 2, 15), (49, 3, 19),
+(50, 1, 18), (50, 2, 12), (50, 3, 11),
+(51, 1, 14), (51, 2, 19), (51, 3, 17),
+(52, 1, 11), (52, 2, 16), (52, 3, 13),
+(53, 1, 17), (53, 2, 13), (53, 3, 10),
+(54, 1, 15), (54, 2, 10), (54, 3, 18),
+(55, 1, 12), (55, 2, 18), (55, 3, 15),
+(56, 1, 19), (56, 2, 14), (56, 3, 12),
+(57, 1, 13), (57, 2, 11), (57, 3, 16),
+(58, 1, 16), (58, 2, 17), (58, 3, 14),
+(59, 1, 10), (59, 2, 15), (59, 3, 19),
+(60, 1, 18), (60, 2, 12), (60, 3, 11),
+(61, 1, 14), (61, 2, 19), (61, 3, 17),
+(62, 1, 11), (62, 2, 16), (62, 3, 13),
+(63, 1, 17), (63, 2, 13), (63, 3, 10),
+(64, 1, 15), (64, 2, 10), (64, 3, 18),
+(65, 1, 12), (65, 2, 18), (65, 3, 15),
+(66, 1, 19), (66, 2, 14), (66, 3, 12),
+(67, 1, 13), (67, 2, 11), (67, 3, 16),
+(68, 1, 16), (68, 2, 17), (68, 3, 14),
+(69, 1, 10), (69, 2, 15), (69, 3, 19),
+(70, 1, 18), (70, 2, 12), (70, 3, 11),
+(71, 1, 14), (71, 2, 19), (71, 3, 17),
+(72, 1, 11), (72, 2, 16), (72, 3, 13),
+(73, 1, 17), (73, 2, 13), (73, 3, 10),
+(74, 1, 15), (74, 2, 10), (74, 3, 18),
+(75, 1, 12), (75, 2, 18), (75, 3, 15),
+(76, 1, 19), (76, 2, 14), (76, 3, 12),
+(77, 1, 13), (77, 2, 11), (77, 3, 16),
+(78, 1, 16), (78, 2, 17), (78, 3, 14),
+(79, 1, 10), (79, 2, 15), (79, 3, 19),
+(80, 1, 18), (80, 2, 12), (80, 3, 11),
+(81, 1, 14), (81, 2, 19), (81, 3, 17),
+(82, 1, 11), (82, 2, 16), (82, 3, 13),
+(83, 1, 17), (83, 2, 13), (83, 3, 10),
+(84, 1, 15), (84, 2, 10), (84, 3, 18),
+(85, 1, 12), (85, 2, 18), (85, 3, 15),
+(86, 1, 19), (86, 2, 14), (86, 3, 12),
+(87, 1, 13), (87, 2, 11), (87, 3, 16),
+-- Survival Horror (88-163)
+(88, 1, 15), (88, 2, 12), (88, 3, 17),
+(89, 1, 18), (89, 2, 14), (89, 3, 11),
+(90, 1, 11), (90, 2, 17), (90, 3, 13),
+(91, 1, 13), (91, 2, 19), (91, 3, 15),
+(92, 1, 16), (92, 2, 11), (92, 3, 18),
+(93, 1, 14), (93, 2, 18), (93, 3, 12),
+(94, 1, 12), (94, 2, 15), (94, 3, 19),
+(95, 1, 17), (95, 2, 13), (95, 3, 10),
+(96, 1, 10), (96, 2, 16), (96, 3, 14),
+(97, 1, 19), (97, 2, 12), (97, 3, 17),
+(98, 1, 14), (98, 2, 10), (98, 3, 13),
+(99, 1, 11), (99, 2, 18), (99, 3, 16),
+(100, 1, 16), (100, 2, 13), (100, 3, 11),
+(101, 1, 15), (101, 2, 11), (101, 3, 18),
+(102, 1, 12), (102, 2, 17), (102, 3, 14),
+(103, 1, 18), (103, 2, 14), (103, 3, 19),
+(104, 1, 13), (104, 2, 19), (104, 3, 12),
+(105, 1, 10), (105, 2, 15), (105, 3, 17),
+(106, 1, 17), (106, 2, 12), (106, 3, 10),
+(107, 1, 14), (107, 2, 10), (107, 3, 15),
+(108, 1, 11), (108, 2, 16), (108, 3, 13),
+(109, 1, 19), (109, 2, 13), (109, 3, 18),
+(110, 1, 15), (110, 2, 18), (110, 3, 11),
+(111, 1, 12), (111, 2, 11), (111, 3, 16),
+(112, 1, 16), (112, 2, 14), (112, 3, 12),
+(113, 1, 13), (113, 2, 17), (113, 3, 19),
+(114, 1, 10), (114, 2, 15), (114, 3, 14),
+(115, 1, 18), (115, 2, 12), (115, 3, 11),
+(116, 1, 14), (116, 2, 19), (116, 3, 17),
+(117, 1, 11), (117, 2, 16), (117, 3, 13),
+(118, 1, 17), (118, 2, 13), (118, 3, 10),
+(119, 1, 15), (119, 2, 10), (119, 3, 18),
+(120, 1, 12), (120, 2, 18), (120, 3, 15),
+(121, 1, 19), (121, 2, 14), (121, 3, 12),
+(122, 1, 13), (122, 2, 11), (122, 3, 16),
+(123, 1, 16), (123, 2, 17), (123, 3, 14),
+(124, 1, 10), (124, 2, 15), (124, 3, 19),
+(125, 1, 18), (125, 2, 12), (125, 3, 11),
+(126, 1, 14), (126, 2, 19), (126, 3, 17),
+(127, 1, 11), (127, 2, 16), (127, 3, 13),
+(128, 1, 17), (128, 2, 13), (128, 3, 10),
+(129, 1, 15), (129, 2, 10), (129, 3, 18),
+(130, 1, 12), (130, 2, 18), (130, 3, 15),
+(131, 1, 19), (131, 2, 14), (131, 3, 12),
+(132, 1, 13), (132, 2, 11), (132, 3, 16),
+(133, 1, 16), (133, 2, 17), (133, 3, 14),
+(134, 1, 10), (134, 2, 15), (134, 3, 19),
+(135, 1, 18), (135, 2, 12), (135, 3, 11),
+(136, 1, 14), (136, 2, 19), (136, 3, 17),
+(137, 1, 11), (137, 2, 16), (137, 3, 13),
+(138, 1, 17), (138, 2, 13), (138, 3, 10),
+(139, 1, 15), (139, 2, 10), (139, 3, 18),
+(140, 1, 12), (140, 2, 18), (140, 3, 15),
+(141, 1, 19), (141, 2, 14), (141, 3, 12),
+(142, 1, 13), (142, 2, 11), (142, 3, 16),
+(143, 1, 16), (143, 2, 17), (143, 3, 14),
+(144, 1, 10), (144, 2, 15), (144, 3, 19),
+(145, 1, 18), (145, 2, 12), (145, 3, 11),
+(146, 1, 14), (146, 2, 19), (146, 3, 17),
+(147, 1, 11), (147, 2, 16), (147, 3, 13),
+(148, 1, 17), (148, 2, 13), (148, 3, 10),
+(149, 1, 15), (149, 2, 10), (149, 3, 18),
+(150, 1, 12), (150, 2, 18), (150, 3, 15),
+(151, 1, 19), (151, 2, 14), (151, 3, 12),
+(152, 1, 13), (152, 2, 11), (152, 3, 16),
+(153, 1, 16), (153, 2, 17), (153, 3, 14),
+(154, 1, 10), (154, 2, 15), (154, 3, 19),
+(155, 1, 18), (155, 2, 12), (155, 3, 11),
+(156, 1, 14), (156, 2, 19), (156, 3, 17),
+(157, 1, 11), (157, 2, 16), (157, 3, 13),
+(158, 1, 17), (158, 2, 13), (158, 3, 10),
+(159, 1, 15), (159, 2, 10), (159, 3, 18),
+(160, 1, 12), (160, 2, 18), (160, 3, 15),
+(161, 1, 19), (161, 2, 14), (161, 3, 12),
+(162, 1, 13), (162, 2, 11), (162, 3, 16),
+(163, 1, 16), (163, 2, 17), (163, 3, 14),
+-- Adventure (164-239)
+(164, 1, 15), (164, 2, 12), (164, 3, 17),
+(165, 1, 18), (165, 2, 14), (165, 3, 11),
+(166, 1, 11), (166, 2, 17), (166, 3, 13),
+(167, 1, 13), (167, 2, 19), (167, 3, 15),
+(168, 1, 16), (168, 2, 11), (168, 3, 18),
+(169, 1, 14), (169, 2, 18), (169, 3, 12),
+(170, 1, 12), (170, 2, 15), (170, 3, 19),
+(171, 1, 17), (171, 2, 13), (171, 3, 10),
+(172, 1, 10), (172, 2, 16), (172, 3, 14),
+(173, 1, 19), (173, 2, 12), (173, 3, 17),
+(174, 1, 14), (174, 2, 10), (174, 3, 13),
+(175, 1, 11), (175, 2, 18), (175, 3, 16),
+(176, 1, 16), (176, 2, 13), (176, 3, 11),
+(177, 1, 15), (177, 2, 11), (177, 3, 18),
+(178, 1, 12), (178, 2, 17), (178, 3, 14),
+(179, 1, 18), (179, 2, 14), (179, 3, 19),
+(180, 1, 13), (180, 2, 19), (180, 3, 12),
+(181, 1, 10), (181, 2, 15), (181, 3, 17),
+(182, 1, 17), (182, 2, 12), (182, 3, 10),
+(183, 1, 14), (183, 2, 10), (183, 3, 15),
+(184, 1, 11), (184, 2, 16), (184, 3, 13),
+(185, 1, 19), (185, 2, 13), (185, 3, 18),
+(186, 1, 15), (186, 2, 18), (186, 3, 11),
+(187, 1, 12), (187, 2, 11), (187, 3, 16),
+(188, 1, 16), (188, 2, 14), (188, 3, 12),
+(189, 1, 13), (189, 2, 17), (189, 3, 19),
+(190, 1, 10), (190, 2, 15), (190, 3, 14),
+(191, 1, 18), (191, 2, 12), (191, 3, 11),
+(192, 1, 14), (192, 2, 19), (192, 3, 17),
+(193, 1, 11), (193, 2, 16), (193, 3, 13),
+(194, 1, 17), (194, 2, 13), (194, 3, 10),
+(195, 1, 15), (195, 2, 10), (195, 3, 18),
+(196, 1, 12), (196, 2, 18), (196, 3, 15),
+(197, 1, 19), (197, 2, 14), (197, 3, 12),
+(198, 1, 13), (198, 2, 11), (198, 3, 16),
+(199, 1, 16), (199, 2, 17), (199, 3, 14),
+(200, 1, 10), (200, 2, 15), (200, 3, 19),
+(201, 1, 18), (201, 2, 12), (201, 3, 11),
+(202, 1, 14), (202, 2, 19), (202, 3, 17),
+(203, 1, 11), (203, 2, 16), (203, 3, 13),
+(204, 1, 17), (204, 2, 13), (204, 3, 10),
+(205, 1, 15), (205, 2, 10), (205, 3, 18),
+(206, 1, 12), (206, 2, 18), (206, 3, 15),
+(207, 1, 19), (207, 2, 14), (207, 3, 12),
+(208, 1, 13), (208, 2, 11), (208, 3, 16),
+(209, 1, 16), (209, 2, 17), (209, 3, 14),
+(210, 1, 10), (210, 2, 15), (210, 3, 19),
+(211, 1, 18), (211, 2, 12), (211, 3, 11),
+(212, 1, 14), (212, 2, 19), (212, 3, 17),
+(213, 1, 11), (213, 2, 16), (213, 3, 13),
+(214, 1, 17), (214, 2, 13), (214, 3, 10),
+(215, 1, 15), (215, 2, 10), (215, 3, 18),
+(216, 1, 12), (216, 2, 18), (216, 3, 15),
+(217, 1, 19), (217, 2, 14), (217, 3, 12),
+(218, 1, 13), (218, 2, 11), (218, 3, 16),
+(219, 1, 16), (219, 2, 17), (219, 3, 14),
+(220, 1, 10), (220, 2, 15), (220, 3, 19),
+(221, 1, 18), (221, 2, 12), (221, 3, 11),
+(222, 1, 14), (222, 2, 19), (222, 3, 17),
+(223, 1, 11), (223, 2, 16), (223, 3, 13),
+(224, 1, 17), (224, 2, 13), (224, 3, 10),
+(225, 1, 15), (225, 2, 10), (225, 3, 18),
+(226, 1, 12), (226, 2, 18), (226, 3, 15),
+(227, 1, 19), (227, 2, 14), (227, 3, 12),
+(228, 1, 13), (228, 2, 11), (228, 3, 16),
+(229, 1, 16), (229, 2, 17), (229, 3, 14),
+(230, 1, 10), (230, 2, 15), (230, 3, 19),
+(231, 1, 18), (231, 2, 12), (231, 3, 11),
+(232, 1, 14), (232, 2, 19), (232, 3, 17),
+(233, 1, 11), (233, 2, 16), (233, 3, 13),
+(234, 1, 17), (234, 2, 13), (234, 3, 10),
+(235, 1, 15), (235, 2, 10), (235, 3, 18),
+(236, 1, 12), (236, 2, 18), (236, 3, 15),
+(237, 1, 19), (237, 2, 14), (237, 3, 12),
+(238, 1, 13), (238, 2, 11), (238, 3, 16),
+(239, 1, 16), (239, 2, 17), (239, 3, 14),
+-- RPG (240-315)
+(240, 1, 15), (240, 2, 12), (240, 3, 17),
+(241, 1, 18), (241, 2, 14), (241, 3, 11),
+(242, 1, 11), (242, 2, 17), (242, 3, 13),
+(243, 1, 13), (243, 2, 19), (243, 3, 15),
+(244, 1, 16), (244, 2, 11), (244, 3, 18),
+(245, 1, 14), (245, 2, 18), (245, 3, 12),
+(246, 1, 12), (246, 2, 15), (246, 3, 19),
+(247, 1, 17), (247, 2, 13), (247, 3, 10),
+(248, 1, 10), (248, 2, 16), (248, 3, 14),
+(249, 1, 19), (249, 2, 12), (249, 3, 17),
+(250, 1, 14), (250, 2, 10), (250, 3, 13),
+(251, 1, 11), (251, 2, 18), (251, 3, 16),
+(252, 1, 16), (252, 2, 13), (252, 3, 11),
+(253, 1, 15), (253, 2, 11), (253, 3, 18),
+(254, 1, 12), (254, 2, 17), (254, 3, 14),
+(255, 1, 18), (255, 2, 14), (255, 3, 19),
+(256, 1, 13), (256, 2, 19), (256, 3, 12),
+(257, 1, 10), (257, 2, 15), (257, 3, 17),
+(258, 1, 17), (258, 2, 12), (258, 3, 10),
+(259, 1, 14), (259, 2, 10), (259, 3, 15),
+(260, 1, 11), (260, 2, 16), (260, 3, 13),
+(261, 1, 19), (261, 2, 13), (261, 3, 18),
+(262, 1, 15), (262, 2, 18), (262, 3, 11),
+(263, 1, 12), (263, 2, 11), (263, 3, 16),
+(264, 1, 16), (264, 2, 14), (264, 3, 12),
+(265, 1, 13), (265, 2, 17), (265, 3, 19),
+(266, 1, 10), (266, 2, 15), (266, 3, 14),
+(267, 1, 18), (267, 2, 12), (267, 3, 11),
+(268, 1, 14), (268, 2, 19), (268, 3, 17),
+(269, 1, 11), (269, 2, 16), (269, 3, 13),
+(270, 1, 17), (270, 2, 13), (270, 3, 10),
+(271, 1, 15), (271, 2, 10), (271, 3, 18),
+(272, 1, 12), (272, 2, 18), (272, 3, 15),
+(273, 1, 19), (273, 2, 14), (273, 3, 12),
+(274, 1, 13), (274, 2, 11), (274, 3, 16),
+(275, 1, 16), (275, 2, 17), (275, 3, 14),
+(276, 1, 10), (276, 2, 15), (276, 3, 19),
+(277, 1, 18), (277, 2, 12), (277, 3, 11),
+(278, 1, 14), (278, 2, 19), (278, 3, 17),
+(279, 1, 11), (279, 2, 16), (279, 3, 13),
+(280, 1, 17), (280, 2, 13), (280, 3, 10),
+(281, 1, 15), (281, 2, 10), (281, 3, 18),
+(282, 1, 12), (282, 2, 18), (282, 3, 15),
+(283, 1, 19), (283, 2, 14), (283, 3, 12),
+(284, 1, 13), (284, 2, 11), (284, 3, 16),
+(285, 1, 16), (285, 2, 17), (285, 3, 14),
+(286, 1, 10), (286, 2, 15), (286, 3, 19),
+(287, 1, 18), (287, 2, 12), (287, 3, 11),
+(288, 1, 14), (288, 2, 19), (288, 3, 17),
+(289, 1, 11), (289, 2, 16), (289, 3, 13),
+(290, 1, 17), (290, 2, 13), (290, 3, 10),
+(291, 1, 15), (291, 2, 10), (291, 3, 18),
+(292, 1, 12), (292, 2, 18), (292, 3, 15),
+(293, 1, 19), (293, 2, 14), (293, 3, 12),
+(294, 1, 13), (294, 2, 11), (294, 3, 16),
+(295, 1, 16), (295, 2, 17), (295, 3, 14),
+(296, 1, 10), (296, 2, 15), (296, 3, 19),
+(297, 1, 18), (297, 2, 12), (297, 3, 11),
+(298, 1, 14), (298, 2, 19), (298, 3, 17),
+(299, 1, 11), (299, 2, 16), (299, 3, 13),
+(300, 1, 17), (300, 2, 13), (300, 3, 10),
+(301, 1, 15), (301, 2, 10), (301, 3, 18),
+(302, 1, 12), (302, 2, 18), (302, 3, 15),
+(303, 1, 19), (303, 2, 14), (303, 3, 12),
+(304, 1, 13), (304, 2, 11), (304, 3, 16),
+(305, 1, 16), (305, 2, 17), (305, 3, 14),
+(306, 1, 10), (306, 2, 15), (306, 3, 19),
+(307, 1, 18), (307, 2, 12), (307, 3, 11),
+(308, 1, 14), (308, 2, 19), (308, 3, 17),
+(309, 1, 11), (309, 2, 16), (309, 3, 13),
+(310, 1, 17), (310, 2, 13), (310, 3, 10),
+(311, 1, 15), (311, 2, 10), (311, 3, 18),
+(312, 1, 12), (312, 2, 18), (312, 3, 15),
+(313, 1, 19), (313, 2, 14), (313, 3, 12),
+(314, 1, 13), (314, 2, 11), (314, 3, 16),
+(315, 1, 16), (315, 2, 17), (315, 3, 14),
+-- Terror (316-391)
+(316, 1, 15), (316, 2, 12), (316, 3, 17),
+(317, 1, 18), (317, 2, 14), (317, 3, 11),
+(318, 1, 11), (318, 2, 17), (318, 3, 13),
+(319, 1, 13), (319, 2, 19), (319, 3, 15),
+(320, 1, 16), (320, 2, 11), (320, 3, 18),
+(321, 1, 14), (321, 2, 18), (321, 3, 12),
+(322, 1, 12), (322, 2, 15), (322, 3, 19),
+(323, 1, 17), (323, 2, 13), (323, 3, 10),
+(324, 1, 10), (324, 2, 16), (324, 3, 14),
+(325, 1, 19), (325, 2, 12), (325, 3, 17),
+(326, 1, 14), (326, 2, 10), (326, 3, 13),
+(327, 1, 11), (327, 2, 18), (327, 3, 16),
+(328, 1, 16), (328, 2, 13), (328, 3, 11),
+(329, 1, 15), (329, 2, 11), (329, 3, 18),
+(330, 1, 12), (330, 2, 17), (330, 3, 14),
+(331, 1, 18), (331, 2, 14), (331, 3, 19),
+(332, 1, 13), (332, 2, 19), (332, 3, 12),
+(333, 1, 10), (333, 2, 15), (333, 3, 17),
+(334, 1, 17), (334, 2, 12), (334, 3, 10),
+(335, 1, 14), (335, 2, 10), (335, 3, 15),
+(336, 1, 11), (336, 2, 16), (336, 3, 13),
+(337, 1, 19), (337, 2, 13), (337, 3, 18),
+(338, 1, 15), (338, 2, 18), (338, 3, 11),
+(339, 1, 12), (339, 2, 11), (339, 3, 16),
+(340, 1, 16), (340, 2, 14), (340, 3, 12),
+(341, 1, 13), (341, 2, 17), (341, 3, 19),
+(342, 1, 10), (342, 2, 15), (342, 3, 14),
+(343, 1, 18), (343, 2, 12), (343, 3, 11),
+(344, 1, 14), (344, 2, 19), (344, 3, 17),
+(345, 1, 11), (345, 2, 16), (345, 3, 13),
+(346, 1, 17), (346, 2, 13), (346, 3, 10),
+(347, 1, 15), (347, 2, 10), (347, 3, 18),
+(348, 1, 12), (348, 2, 18), (348, 3, 15),
+(349, 1, 19), (349, 2, 14), (349, 3, 12),
+(350, 1, 13), (350, 2, 11), (350, 3, 16),
+(351, 1, 16), (351, 2, 17), (351, 3, 14),
+(352, 1, 10), (352, 2, 15), (352, 3, 19),
+(353, 1, 18), (353, 2, 12), (353, 3, 11),
+(354, 1, 14), (354, 2, 19), (354, 3, 17),
+(355, 1, 11), (355, 2, 16), (355, 3, 13),
+(356, 1, 17), (356, 2, 13), (356, 3, 10),
+(357, 1, 15), (357, 2, 10), (357, 3, 18),
+(358, 1, 12), (358, 2, 18), (358, 3, 15),
+(359, 1, 19), (359, 2, 14), (359, 3, 12),
+(360, 1, 13), (360, 2, 11), (360, 3, 16),
+(361, 1, 16), (361, 2, 17), (361, 3, 14),
+(362, 1, 10), (362, 2, 15), (362, 3, 19),
+(363, 1, 18), (363, 2, 12), (363, 3, 11),
+(364, 1, 14), (364, 2, 19), (364, 3, 17),
+(365, 1, 11), (365, 2, 16), (365, 3, 13),
+(366, 1, 17), (366, 2, 13), (366, 3, 10),
+(367, 1, 15), (367, 2, 10), (367, 3, 18),
+(368, 1, 12), (368, 2, 18), (368, 3, 15),
+(369, 1, 19), (369, 2, 14), (369, 3, 12),
+(370, 1, 13), (370, 2, 11), (370, 3, 16),
+(371, 1, 16), (371, 2, 17), (371, 3, 14),
+(372, 1, 10), (372, 2, 15), (372, 3, 19),
+(373, 1, 18), (373, 2, 12), (373, 3, 11),
+(374, 1, 14), (374, 2, 19), (374, 3, 17),
+(375, 1, 11), (375, 2, 16), (375, 3, 13),
+(376, 1, 17), (376, 2, 13), (376, 3, 10),
+(377, 1, 15), (377, 2, 10), (377, 3, 18),
+(378, 1, 12), (378, 2, 18), (378, 3, 15),
+(379, 1, 19), (379, 2, 14), (379, 3, 12),
+(380, 1, 13), (380, 2, 11), (380, 3, 16),
+(381, 1, 16), (381, 2, 17), (381, 3, 14),
+(382, 1, 10), (382, 2, 15), (382, 3, 19),
+(383, 1, 18), (383, 2, 12), (383, 3, 11),
+(384, 1, 14), (384, 2, 19), (384, 3, 17),
+(385, 1, 11), (385, 2, 16), (385, 3, 13),
+(386, 1, 17), (386, 2, 13), (386, 3, 10),
+(387, 1, 15), (387, 2, 10), (387, 3, 18),
+(388, 1, 12), (388, 2, 18), (388, 3, 15),
+(389, 1, 19), (389, 2, 14), (389, 3, 12),
+(390, 1, 13), (390, 2, 11), (390, 3, 16),
+(391, 1, 16), (391, 2, 17), (391, 3, 14),
+-- Arcade (392-449)
+(392, 1, 15), (392, 2, 12), (392, 3, 17),
+(393, 1, 18), (393, 2, 14), (393, 3, 11),
+(394, 1, 11), (394, 2, 17), (394, 3, 13),
+(395, 1, 13), (395, 2, 19), (395, 3, 15),
+(396, 1, 16), (396, 2, 11), (396, 3, 18),
+(397, 1, 14), (397, 2, 18), (397, 3, 12),
+(398, 1, 12), (398, 2, 15), (398, 3, 19),
+(399, 1, 17), (399, 2, 13), (399, 3, 10),
+(400, 1, 10), (400, 2, 16), (400, 3, 14),
+(401, 1, 19), (401, 2, 12), (401, 3, 17),
+(402, 1, 14), (402, 2, 10), (402, 3, 13),
+(403, 1, 11), (403, 2, 18), (403, 3, 16),
+(404, 1, 16), (404, 2, 13), (404, 3, 11),
+(405, 1, 15), (405, 2, 11), (405, 3, 18),
+(406, 1, 12), (406, 2, 17), (406, 3, 14),
+(407, 1, 18), (407, 2, 14), (407, 3, 19),
+(408, 1, 13), (408, 2, 19), (408, 3, 12),
+(409, 1, 10), (409, 2, 15), (409, 3, 17),
+(410, 1, 17), (410, 2, 12), (410, 3, 10),
+(411, 1, 14), (411, 2, 10), (411, 3, 15),
+(412, 1, 11), (412, 2, 16), (412, 3, 13),
+(413, 1, 19), (413, 2, 13), (413, 3, 18),
+(414, 1, 15), (414, 2, 18), (414, 3, 11),
+(415, 1, 12), (415, 2, 11), (415, 3, 16),
+(416, 1, 16), (416, 2, 14), (416, 3, 12),
+(417, 1, 13), (417, 2, 17), (417, 3, 19),
+(418, 1, 10), (418, 2, 15), (418, 3, 14),
+(419, 1, 18), (419, 2, 12), (419, 3, 11),
+(420, 1, 14), (420, 2, 19), (420, 3, 17),
+(421, 1, 11), (421, 2, 16), (421, 3, 13),
+(422, 1, 17), (422, 2, 13), (422, 3, 10),
+(423, 1, 15), (423, 2, 10), (423, 3, 18),
+(424, 1, 12), (424, 2, 18), (424, 3, 15),
+(425, 1, 19), (425, 2, 14), (425, 3, 12),
+(426, 1, 13), (426, 2, 11), (426, 3, 16),
+(427, 1, 16), (427, 2, 17), (427, 3, 14),
+(428, 1, 10), (428, 2, 15), (428, 3, 19),
+(429, 1, 18), (429, 2, 12), (429, 3, 11),
+(430, 1, 14), (430, 2, 19), (430, 3, 17),
+(431, 1, 11), (431, 2, 16), (431, 3, 13),
+(432, 1, 17), (432, 2, 13), (432, 3, 10),
+(433, 1, 15), (433, 2, 10), (433, 3, 18),
+(434, 1, 12), (434, 2, 18), (434, 3, 15),
+(435, 1, 19), (435, 2, 14), (435, 3, 12),
+(436, 1, 13), (436, 2, 11), (436, 3, 16),
+(437, 1, 16), (437, 2, 17), (437, 3, 14),
+(438, 1, 10), (438, 2, 15), (438, 3, 19),
+(439, 1, 18), (439, 2, 12), (439, 3, 11),
+(440, 1, 14), (440, 2, 19), (440, 3, 17),
+(441, 1, 11), (441, 2, 16), (441, 3, 13),
+(442, 1, 17), (442, 2, 13), (442, 3, 10),
+(443, 1, 15), (443, 2, 10), (443, 3, 18),
+(444, 1, 12), (444, 2, 18), (444, 3, 15),
+(445, 1, 19), (445, 2, 14), (445, 3, 12),
+(446, 1, 13), (446, 2, 11), (446, 3, 16),
+(447, 1, 16), (447, 2, 17), (447, 3, 14),
+(448, 1, 10), (448, 2, 15), (448, 3, 19),
+(449, 1, 18), (449, 2, 12), (449, 3, 11),
+-- Shooter (450-525)
+(450, 1, 15), (450, 2, 12), (450, 3, 17),
+(451, 1, 18), (451, 2, 14), (451, 3, 11),
+(452, 1, 11), (452, 2, 17), (452, 3, 13),
+(453, 1, 13), (453, 2, 19), (453, 3, 15),
+(454, 1, 16), (454, 2, 11), (454, 3, 18),
+(455, 1, 14), (455, 2, 18), (455, 3, 12),
+(456, 1, 12), (456, 2, 15), (456, 3, 19),
+(457, 1, 17), (457, 2, 13), (457, 3, 10),
+(458, 1, 10), (458, 2, 16), (458, 3, 14),
+(459, 1, 19), (459, 2, 12), (459, 3, 17),
+(460, 1, 14), (460, 2, 10), (460, 3, 13),
+(461, 1, 11), (461, 2, 18), (461, 3, 16),
+(462, 1, 16), (462, 2, 13), (462, 3, 11),
+(463, 1, 15), (463, 2, 11), (463, 3, 18),
+(464, 1, 12), (464, 2, 17), (464, 3, 14),
+(465, 1, 18), (465, 2, 14), (465, 3, 19),
+(466, 1, 13), (466, 2, 19), (466, 3, 12),
+(467, 1, 10), (467, 2, 15), (467, 3, 17),
+(468, 1, 17), (468, 2, 12), (468, 3, 10),
+(469, 1, 14), (469, 2, 10), (469, 3, 15),
+(470, 1, 11), (470, 2, 16), (470, 3, 13),
+(471, 1, 19), (471, 2, 13), (471, 3, 18),
+(472, 1, 15), (472, 2, 18), (472, 3, 11),
+(473, 1, 12), (473, 2, 11), (473, 3, 16),
+(474, 1, 16), (474, 2, 14), (474, 3, 12),
+(475, 1, 13), (475, 2, 17), (475, 3, 19),
+(476, 1, 10), (476, 2, 15), (476, 3, 14),
+(477, 1, 18), (477, 2, 12), (477, 3, 11),
+(478, 1, 14), (478, 2, 19), (478, 3, 17),
+(479, 1, 11), (479, 2, 16), (479, 3, 13),
+(480, 1, 17), (480, 2, 13), (480, 3, 10),
+(481, 1, 15), (481, 2, 10), (481, 3, 18),
+(482, 1, 12), (482, 2, 18), (482, 3, 15),
+(483, 1, 19), (483, 2, 14), (483, 3, 12),
+(484, 1, 13), (484, 2, 11), (484, 3, 16),
+(485, 1, 16), (485, 2, 17), (485, 3, 14),
+(486, 1, 10), (486, 2, 15), (486, 3, 19),
+(487, 1, 18), (487, 2, 12), (487, 3, 11),
+(488, 1, 14), (488, 2, 19), (488, 3, 17),
+(489, 1, 11), (489, 2, 16), (489, 3, 13),
+(490, 1, 17), (490, 2, 13), (490, 3, 10),
+(491, 1, 15), (491, 2, 10), (491, 3, 18),
+(492, 1, 12), (492, 2, 18), (492, 3, 15),
+(493, 1, 19), (493, 2, 14), (493, 3, 12),
+(494, 1, 13), (494, 2, 11), (494, 3, 16),
+(495, 1, 16), (495, 2, 17), (495, 3, 14),
+(496, 1, 10), (496, 2, 15), (496, 3, 19),
+(497, 1, 18), (497, 2, 12), (497, 3, 11),
+(498, 1, 14), (498, 2, 19), (498, 3, 17),
+(499, 1, 11), (499, 2, 16), (499, 3, 13),
+(500, 1, 17), (500, 2, 13), (500, 3, 10),
+(501, 1, 15), (501, 2, 10), (501, 3, 18),
+(502, 1, 12), (502, 2, 18), (502, 3, 15),
+(503, 1, 19), (503, 2, 14), (503, 3, 12),
+(504, 1, 13), (504, 2, 11), (504, 3, 16),
+(505, 1, 16), (505, 2, 17), (505, 3, 14),
+(506, 1, 10), (506, 2, 15), (506, 3, 19),
+(507, 1, 18), (507, 2, 12), (507, 3, 11),
+(508, 1, 14), (508, 2, 19), (508, 3, 17),
+(509, 1, 11), (509, 2, 16), (509, 3, 13),
+(510, 1, 17), (510, 2, 13), (510, 3, 10),
+(511, 1, 15), (511, 2, 10), (511, 3, 18),
+(512, 1, 12), (512, 2, 18), (512, 3, 15),
+(513, 1, 19), (513, 2, 14), (513, 3, 12),
+(514, 1, 13), (514, 2, 11), (514, 3, 16),
+(515, 1, 16), (515, 2, 17), (515, 3, 14),
+(516, 1, 10), (516, 2, 15), (516, 3, 19),
+(517, 1, 18), (517, 2, 12), (517, 3, 11),
+(518, 1, 14), (518, 2, 19), (518, 3, 17),
+(519, 1, 11), (519, 2, 16), (519, 3, 13),
+(520, 1, 17), (520, 2, 13), (520, 3, 10),
+(521, 1, 15), (521, 2, 10), (521, 3, 18),
+(522, 1, 12), (522, 2, 18), (522, 3, 15),
+(523, 1, 19), (523, 2, 14), (523, 3, 12),
+(524, 1, 13), (524, 2, 11), (524, 3, 16),
+(525, 1, 16), (525, 2, 17), (525, 3, 14);
+
+
+
+-- JOINS P1
+-- Juego especifico en una sucursal
+SELECT p.p_name, b.b_name, con.con_name, st.st_quantity FROM Stock st
+	JOIN Products p ON st.p_id = p.p_id
+	JOIN Branches b ON st.b_id = b.b_id
+    JOIN Consoles con ON p.con_id = con.con_id
+	WHERE p.p_name = 'GTA VI' AND b.b_name = 'Sucursal Río';
+
+-- Consola con sus juegos
+SELECT con.con_name, p.p_name, p.p_price FROM Consoles con
+	JOIN Products p ON con.con_id = p.con_id
+	WHERE con.con_name = 'Nintendo Switch 2';
+
+-- Sucursal con sus empleados y roles
+SELECT e.e_name, e.e_lastName, r.r_name, b.b_name FROM Employees e
+	JOIN Roles r ON e.r_id = r.r_id
+    JOIN Branches b ON e.b_id = b.b_id
+    WHERE b.b_name = 'Sucursal Río';
+
+
+-- VIEWS 
+-- Total de compras por cliente
+CREATE VIEW SalesxClient AS
+	SELECT CONCAT(c.c_name,' ', c.c_lastName) AS Cliente, 
+		COUNT(t.t_id) AS TotalSales FROM Clients c
+    JOIN Tickets t ON c.c_id = t.c_id 
+    GROUP BY c.c_id
+    ORDER BY TotalSales DESC;
+
+SELECT * FROM SalesxClient;
+
+-- Total de Ventas por Sucursal 
+CREATE VIEW Salesx_Branch AS
+    SELECT 
+        b.b_name, 
+        COUNT(t.t_id) AS BranchSales 
+    FROM Branches b
+    JOIN Tickets t ON b.b_id = t.b_id
+    GROUP BY b.b_name; 
+
+SELECT * FROM Salesx_Branch;
+    
+-- Views 23/03/2026
+-- 1. Catálogo Completo
+CREATE OR REPLACE VIEW CatalogoProveedor AS
+SELECT
+	p.p_id AS ID,
+    p.p_name AS Producto,
+    c.cat_name AS Categoria,
+    s.s_name AS Proveedor,
+    con.con_name AS Consola,
+    p.p_price AS Precio
+FROM Products p
+JOIN Category_game c ON p.cat_id = c.cat_id
+JOIN Suppliers s ON p.s_id = s.s_id
+JOIN Consoles con ON p.con_id = con.con_id
+	WHERE s.s_name = 'Microsoft';
+	SELECT * FROM CatalogoProveedor;
+
+-- 2. Inventarios en estados criticos
+CREATE OR REPLACE VIEW Inventario_Critico AS
+SELECT
+	b.b_name AS Sucursal,
+    p.p_name AS Producto,
+    st.st_quantity AS Cantidad
+FROM Stock st
+JOIN Products p ON st.p_id = p.p_id
+JOIN Branches b ON st.b_id = b.b_id
+WHERE st.st_quantity < 6
+ORDER BY st.st_quantity ASC;
+SELECT * FROM Inventario_Critico;
+
+-- 3. Top 3 clientes VIP
+CREATE OR REPLACE VIEW Top_Clientes AS
+SELECT 
+    c.c_name AS Nombre, 
+    c.c_lastName AS Apellido, 
+    COUNT(t.t_id) AS Total_Compras, 
+    SUM(t.t_SalePrice) AS Dinero_Gastado
+FROM Clients c
+JOIN Tickets t ON c.c_id = t.c_id
+GROUP BY c.c_id
+ORDER BY Dinero_Gastado DESC
+LIMIT 3;
+SELECT * FROM Top_Clientes;
+
+-- 4. Rendimiento por empleado
+CREATE OR REPLACE VIEW Rendimiento_Empleados AS
+SELECT 
+    e.e_name AS Empleado,
+    b.b_name AS Sucursal,
+    COUNT(t.t_id) AS Ventas_Realizadas,
+    SUM(t.t_SalePrice) AS Ingresos_Generados
+FROM Tickets t
+JOIN Employees e ON t.e_id = e.e_id
+JOIN Branches b ON t.b_id = b.b_id
+GROUP BY e.e_id, b.b_name
+ORDER BY Ingresos_Generados DESC;
+SELECT * FROM Rendimiento_Empleados;
+
+-- 5. Demografía de clientes
+CREATE VIEW Demografia_Ubicacion AS
+SELECT 
+    c_location AS Ubicacion, 
+    COUNT(c_id) AS Total_Clientes
+FROM Clients
+GROUP BY c_location
+ORDER BY Total_Clientes DESC;
+SELECT * FROM Demografia_Ubicacion;
+
+-- 6. Ingresos Totales por sucursal
+CREATE VIEW Ingresos_Sucursal AS
+SELECT 
+    b.b_name AS Sucursal, 
+    COUNT(t.t_id) AS Total_Tickets, 
+    SUM(t.t_SalePrice) AS Ingresos_Totales
+FROM Tickets t
+JOIN Branches b ON t.b_id = b.b_id
+GROUP BY b.b_name
+ORDER BY Ingresos_Totales DESC;
+SELECT * FROM Ingresos_Sucursal;
+
+-- 7. Valor del inventario de juegos por consolas
+CREATE VIEW Valor_Stock_Consola AS
+SELECT 
+    con.con_name AS Consola, 
+    SUM(st.st_quantity) AS Total_Copias,
+    SUM(st.st_quantity * p.p_price) AS Valor_Monetario_Total
+FROM Stock st
+JOIN Products p ON st.p_id = p.p_id
+JOIN Consoles con ON p.con_id = con.con_id
+GROUP BY con.con_name
+ORDER BY Valor_Monetario_Total DESC;
+SELECT * FROM Valor_Stock_Consola;
+
+-- 8. Cantidad de juegos por categoria
+CREATE VIEW Juegos_Por_Categoria AS
+SELECT 
+    c.cat_name AS Categoria, 
+    COUNT(p.p_id) AS Titulos_Diferentes
+FROM Products p
+JOIN Category_game c ON p.cat_id = c.cat_id
+GROUP BY c.cat_name
+ORDER BY Titulos_Diferentes DESC;
+SELECT * FROM Juegos_Por_Categoria;
+
+-- 9. Vista general de empleados
+CREATE VIEW Directorio_Empleados AS
+SELECT 
+    CONCAT(e.e_name, ' ', e.e_lastName) AS Nombre_Completo,
+    e.e_phone AS Telefono,
+    e.e_email AS Correo,
+    r.r_name AS Puesto,
+    b.b_name AS Sucursal
+FROM Employees e
+JOIN Roles r ON e.r_id = r.r_id
+JOIN Branches b ON e.b_id = b.b_id;
+SELECT * FROM Directorio_Empleados;
+
+-- 10. Ultimas acciones de auditoria
+CREATE OR REPLACE VIEW Auditoria_Reciente AS
+SELECT 
+    l_date AS Fecha_Hora, 
+    l_user AS Usuario, 
+    l_table AS Tabla_Afectada, 
+    l_action AS Accion_Realizada
+FROM Audit_Log
+ORDER BY l_date DESC
+LIMIT 10;
+SELECT * FROM Auditoria_Reciente;
+
+-- Triggers para validaciones de nuestras entidades
+-- triggers para registrar cambios en...
+-- Products
+DELIMITER $$
+
+CREATE TRIGGER products_after_insert
+AFTER INSERT ON Products
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (USER(), 'Products', CONCAT('INSERT: ', NEW.p_name));
+END$$
+
+CREATE TRIGGER products_after_update
+AFTER UPDATE ON Products
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (USER(), 'Products', CONCAT('UPDATE: ', NEW.p_name, ' precio ', OLD.p_price, ' -> ', NEW.p_price));
+END$$
+
+CREATE TRIGGER products_after_delete
+AFTER DELETE ON Products
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (USER(), 'Products', CONCAT('DELETE: ', OLD.p_name));
+END$$
+
+
+-- Clients
+CREATE TRIGGER clients_after_insert
+AFTER INSERT ON Clients
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (USER(), 'Clients', CONCAT('INSERT: ', NEW.c_name, ' ', NEW.c_lastName));
+END$$
+
+CREATE TRIGGER clients_after_update
+AFTER UPDATE ON Clients
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (USER(), 'Clients', CONCAT('UPDATE: ', NEW.c_name, ' ', NEW.c_lastName));
+END$$
+
+CREATE TRIGGER clients_after_delete
+AFTER DELETE ON Clients
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (USER(), 'Clients', CONCAT('DELETE: ', OLD.c_name, ' ', OLD.c_lastName));
+END$$
+
+
+-- Tickets
+CREATE TRIGGER tickets_after_insert
+AFTER INSERT ON Tickets
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (USER(), 'Tickets', CONCAT('INSERT: ticket_id ', NEW.t_id, ' cliente ', NEW.c_id));
+END$$
+
+CREATE TRIGGER tickets_after_update
+AFTER UPDATE ON Tickets
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (USER(), 'Tickets', CONCAT('UPDATE: ticket_id ', NEW.t_id, ' precio ', OLD.t_SalePrice, ' -> ', NEW.t_SalePrice));
+END$$
+
+CREATE TRIGGER tickets_after_delete
+AFTER DELETE ON Tickets
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (USER(), 'Tickets', CONCAT('DELETE: ticket_id ', OLD.t_id));
+END$$
+
+
+-- Stock
+CREATE TRIGGER stock_after_insert
+AFTER INSERT ON Stock
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (USER(), 'Stock', CONCAT('INSERT: producto ', NEW.p_id, ' sucursal ', NEW.b_id, ' cantidad ', NEW.st_quantity));
+END$$
+
+CREATE TRIGGER stock_after_update
+AFTER UPDATE ON Stock
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (USER(), 'Stock', CONCAT('UPDATE: producto ', NEW.p_id, ' cantidad ', OLD.st_quantity, ' -> ', NEW.st_quantity));
+END$$
+
+CREATE TRIGGER stock_after_delete
+AFTER DELETE ON Stock
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (USER(), 'Stock', CONCAT('DELETE: producto ', OLD.p_id, ' sucursal ', OLD.b_id));
+END$$
+
+
+-- Employees
+CREATE TRIGGER employees_after_insert
+AFTER INSERT ON Employees
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (USER(), 'Employees', CONCAT('INSERT: ', NEW.e_name, ' ', NEW.e_lastName));
+END$$
+
+CREATE TRIGGER employees_after_update
+AFTER UPDATE ON Employees
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (USER(), 'Employees', CONCAT('UPDATE: ', NEW.e_name, ' ', NEW.e_lastName));
+END$$
+
+CREATE TRIGGER employees_after_delete
+AFTER DELETE ON Employees
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (USER(), 'Employees', CONCAT('DELETE: ', OLD.e_name, ' ', OLD.e_lastName));
+END$$
+
+DELIMITER ;
+
+
+
+-- 1. Evitar precio negativo en un producto
+DELIMITER //
+
+CREATE TRIGGER Val_PrecioProd
+BEFORE INSERT ON Products
+FOR EACH ROW
+BEGIN
+    IF NEW.p_price <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: El precio no puede ser 0 o negativo.';
+    END IF;
+END //
+
+-- 2. Evitar total negativo en ventas
+CREATE TRIGGER Val_TicketTotal
+BEFORE INSERT ON Tickets
+FOR EACH ROW
+BEGIN
+    IF NEW.t_SalePrice < 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: El ticket no puede ser negativo.';
+    END IF;
+END //
+
+-- 3. Evitar stock negativo
+CREATE TRIGGER Val_Stock
+BEFORE UPDATE ON Stock
+FOR EACH ROW
+BEGIN
+    IF NEW.st_quantity < 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: El stock no puede ser menor a 0.';
+    END IF;
+END //
+
+-- 4. Validar formato de correo en clientes
+CREATE TRIGGER Val_EmailClient
+BEFORE INSERT ON Clients
+FOR EACH ROW
+BEGIN
+    IF NEW.c_email NOT LIKE '%@%' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Correo de cliente inválido.';
+    END IF;
+END //
+
+-- 5. Validar formato de correo en Empleados
+CREATE TRIGGER Val_EmailEmp
+BEFORE INSERT ON Employees
+FOR EACH ROW
+BEGIN
+    IF NEW.e_email NOT LIKE '%@%' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Correo de empleado inválido.';
+    END IF;
+END //
+
+-- 6. Auditoria nuevo producto
+CREATE TRIGGER Aud_Prod
+AFTER INSERT ON Products
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (CURRENT_USER(), 'Products', CONCAT('Nuevo producto: ', NEW.p_name));
+END //
+
+-- 7. Auditoria nueva venta
+CREATE TRIGGER Aud_Ticket
+AFTER INSERT ON Tickets
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (CURRENT_USER(), 'Tickets', CONCAT('Venta registrada. Total: $', NEW.t_SalePrice));
+END //
+
+-- 8. Auditoria actualización del stock
+CREATE TRIGGER Aud_Stock
+AFTER UPDATE ON Stock
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (CURRENT_USER(), 'Stock', CONCAT('Stock modificado. Prod ID: ', NEW.p_id, ' | Nueva cant: ', NEW.st_quantity));
+END //
+
+-- 9. Auditoria nuevo cliente
+CREATE TRIGGER Aud_Client
+AFTER INSERT ON Clients
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (CURRENT_USER(), 'Clients', CONCAT('Alta cliente: ', NEW.c_name, ' ', NEW.c_lastName));
+END //
+
+-- 10. Auditoria neuvo empleado
+CREATE TRIGGER Aud_Emp
+AFTER INSERT ON Employees
+FOR EACH ROW
+BEGIN
+    INSERT INTO Audit_Log (l_user, l_table, l_action)
+    VALUES (CURRENT_USER(), 'Employees', CONCAT('Alta empleado: ', NEW.e_name, ' ', NEW.e_lastName));
+END //
+
+DELIMITER ;
+
+-- 1. CRUD en Products
+-- Create para insertar
+DELIMITER // 
+
+CREATE PROCEDURE CrearProducto(
+    IN p_nombre VARCHAR(50), 
+    IN p_precio DECIMAL(10,2), 
+    IN p_cat INT, 
+    IN p_prov INT, 
+    IN p_consola INT
+)
+BEGIN
+    INSERT INTO Products (p_name, p_price, cat_id, s_id, con_id) 
+    VALUES (p_nombre, p_precio, p_cat, p_prov, p_consola);
+END //
+
+-- READ con joins
+CREATE PROCEDURE LeerProductos()
+BEGIN
+    SELECT p.p_id, p.p_name, p.p_price, c.cat_name, s.s_name, con.con_name 
+    FROM Products p
+    JOIN Category_game c ON p.cat_id = c.cat_id
+    JOIN Suppliers s ON p.s_id = s.s_id
+    JOIN Consoles con ON p.con_id = con.con_id;
+END //
+
+-- UPDATE en precios
+CREATE PROCEDURE ActualizarPrecioProducto(IN p_id INT, IN p_nuevo_precio DECIMAL(10,2))
+BEGIN
+    UPDATE Products SET p_price = p_nuevo_precio WHERE p_id = p_id;
+END //
+
+-- DELETE 
+CREATE PROCEDURE EliminarProducto(IN p_id INT)
+BEGIN
+    DELETE FROM Products WHERE p_id = p_id;
+END //
+
+-- 2. CRUD en Clients
+-- CREATE para nuevo cliente
+CREATE PROCEDURE CrearCliente(
+    IN p_nombre VARCHAR(25), 
+    IN p_apellido VARCHAR(25), 
+    IN p_email VARCHAR(100), 
+    IN p_nacimiento DATE, 
+    IN p_ubicacion VARCHAR(100)
+)
+BEGIN
+    INSERT INTO Clients (c_name, c_lastName, c_email, c_BirthDate, c_location) 
+    VALUES (p_nombre, p_apellido, p_email, p_nacimiento, p_ubicacion);
+END //
+
+-- READ info de cliente
+CREATE PROCEDURE LeerClientes()
+BEGIN
+    SELECT * FROM Clients ORDER BY c_name ASC;
+END //
+
+-- UPDATE enfocado en la ubicacion y su email
+CREATE PROCEDURE ActualizarDatosCliente(IN p_id INT, IN p_email VARCHAR(100), IN p_ubicacion VARCHAR(100))
+BEGIN
+    UPDATE Clients SET c_email = p_email, c_location = p_ubicacion WHERE c_id = p_id;
+END //
+
+-- DELETE un cliente
+CREATE PROCEDURE EliminarCliente(IN p_id INT)
+BEGIN
+    DELETE FROM Clients WHERE c_id = p_id;
+END //
+
+-- 3. CRUD para Employees
+-- CREATE nuevo empleado
+
+CREATE PROCEDURE CrearEmpleado(
+    IN p_nombre VARCHAR(50), IN p_apellido VARCHAR(50), 
+    IN p_tel VARCHAR(20), IN p_email VARCHAR(50), 
+    IN p_nac DATE, IN p_rol INT, IN p_sucursal INT
+)
+BEGIN
+    INSERT INTO Employees (e_name, e_lastName, e_phone, e_email, e_BirthDate, r_id, b_id) 
+    VALUES (p_nombre, p_apellido, p_tel, p_email, p_nac, p_rol, p_sucursal);
+END //
+
+-- READ para info de empleado
+CREATE PROCEDURE LeerEmpleados()
+BEGIN
+    SELECT e.e_id, CONCAT(e.e_name, ' ', e.e_lastName) AS Nombre, r.r_name AS Puesto, b.b_name AS Sucursal
+    FROM Employees e
+    JOIN Roles r ON e.r_id = r.r_id
+    JOIN Branches b ON e.b_id = b.b_id;
+END //
+
+-- UPDATE mover de sucursal
+CREATE PROCEDURE TrasladarEmpleado(IN p_id INT, IN p_nueva_sucursal INT)
+BEGIN
+    UPDATE Employees SET b_id = p_nueva_sucursal WHERE e_id = p_id;
+END //
+
+-- DELETE (ni que hubiera pierde aqui)
+CREATE PROCEDURE EliminarEmpleado(IN p_id INT)
+BEGIN
+    DELETE FROM Employees WHERE e_id = p_id;
+END //
+
+
+-- 4. CRUD para Tickets
+-- CREATE nuevo ticket
+CREATE PROCEDURE CrearTicket(
+    IN p_fecha DATETIME, IN p_total DECIMAL(10,2), 
+    IN p_cliente INT, IN p_empleado INT, IN p_sucursal INT
+)
+BEGIN
+    INSERT INTO Tickets (t_date, t_SalePrice, c_id, e_id, b_id) 
+    VALUES (p_fecha, p_total, p_cliente, p_empleado, p_sucursal);
+END //
+
+-- READ
+CREATE PROCEDURE LeerTickets()
+BEGIN
+    SELECT t.t_id, t.t_date, t.t_SalePrice, c.c_name AS Cliente, b.b_name AS Sucursal 
+    FROM Tickets t
+    JOIN Clients c ON t.c_id = c.c_id
+    JOIN Branches b ON t.b_id = b.b_id
+    ORDER BY t.t_date DESC;
+END //
+
+-- UPDATE para corregir el totalfinal del ticket
+CREATE PROCEDURE CorregirTotalTicket(IN p_id INT, IN p_nuevo_total DECIMAL(10,2))
+BEGIN
+    UPDATE Tickets SET t_SalePrice = p_nuevo_total WHERE t_id = p_id;
+END //
+
+-- DELETE por si cancelan venta
+CREATE PROCEDURE CancelarTicket(IN p_id INT)
+BEGIN
+    DELETE FROM Tickets WHERE t_id = p_id;
+END //
+
+DELIMITER ;
